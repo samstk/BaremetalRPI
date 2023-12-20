@@ -7,5 +7,5 @@ Current outlook of objectives (may be subject to change)
 * Writing to Physical Display - Graphics Management
 * Writing fonts to Physical Display - Graphics Management
 * System Timer Counter
-* Generating Interrupt via Timer - Multicore Processing.
+* Generating Interrupt via Timer.
 * Creating Task System - OS Programming
