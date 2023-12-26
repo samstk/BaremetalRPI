@@ -3,7 +3,7 @@
 SRCS = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp) $(wildcard src/*/*/*.cpp)
 OBJS = $(SRCS:.cpp=.o)
 INCLUDEARGS = -I include/
-CFLAGS = -Wall -Wno-unknown-pragmas -ffreestanding -O2 -nostdinc -nostdlib -nostartfiles -mcpu=cortex-a53+nosimd
+CFLAGS = -Wall -Wno-unknown-pragmas -ffreestanding -O3 -nostdinc -nostdlib -nostartfiles -mcpu=cortex-a53+nosimd
 AARCH64PATH = ~/gcc-arm-10.3-2021.07-x86_64-aarch64-none-elf/bin/aarch64-none-elf
 
 all: clean kernel8.img

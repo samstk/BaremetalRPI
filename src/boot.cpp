@@ -3,26 +3,36 @@
 /// @brief The main function for the first core
 extern "C" void main() {
     // Test GPIO Logic by flashing LEDs
-    GPIOHandle user(22);
-    GPIOHandle pin2(29);
+    GPIOHandle blinker(22);
+    GPIOHandle blinker2(23);
+    GPIOHandle blinker3(24);                             
 
-    user.SetOutput();
-    pin2.SetOutput();
+    blinker.SetOutput();
+    blinker2.SetOutput();
+    blinker3.SetOutput();
 
     while(true) {
-        user.Write(true);
-        pin2.Write(false);
+        blinker.Write(true);
+        blinker2.Write(false);
+        blinker3.Write(false);
 
         // For now since we don't have timers set up
         // just use iterations to introduce a pause
-        for(volatile int i = 0; i < 1000000; i++) {
+        for(int i = 0; i < 1500000; i++) {
+            __asm__("nop");1
+        }
+
+        blinker.Write(false);
+        blinker2.Write(true);
+        blinker3.Write(false);
+        for(int i = 0; i < 1500000; i++) {
             __asm__("nop");
         }
 
-        user.Write(false);
-        pin2.Write(true);
-        
-        for(volatile int i = 0; i < 2000000; i++) {
+        blinker.Write(false);
+        blinker2.Write(false);
+        blinker3.Write(true);
+        for(int i = 0; i < 1500000; i++) {
             __asm__("nop");
         }
     }
