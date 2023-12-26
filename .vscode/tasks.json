@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Kernel8.img",
+            "type": "shell",
+            "command": "./make.bat",
+            "problemMatcher": []
+        },
+        {
+            "label": "Copy kernel8.img to Disk",
+            "type": "shell",
+            "command": "cp",
+            "args": [
+                "${workspaceFolder}/build/kernel8.img",
+                "E:\\kernel8.img"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
