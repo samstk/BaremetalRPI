@@ -4,7 +4,10 @@ A C++ implementation of a bare metal OS for the Raspberry PI 3a+.
 ## Credits
 Credits to bztsrc on Github for his C tutorials
 (https://github.com/bztsrc/raspi3-tutorial/blob/master/), which helped enormously for the
-initial setup (mainly start.S and link.ld). It is another helpful resource which is worth a look at.
+initial setup (mainly start.S and link.ld). It is another helpful resource which is worth
+a look at.
+
+Also credits to PeterLemon for his assembly tutorials which also helped enormously: https://github.com/PeterLemon/RaspberryPi/blob/master
 
 ## Why C++ and not C
 Previously I have programmed a bare metal RPI image using C, however

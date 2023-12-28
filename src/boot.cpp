@@ -1,8 +1,20 @@
 #include <hardware/gpio.hpp> 
+#include <hardware/framebuffer.hpp>
+#include <gfx/gfx.hpp>
+#include <hardware/mailbox.hpp>
 
 /// @brief The main function for the first core
 extern "C" void main() {
-    // Test GPIO Logic by flashing LEDs
+    // Initialise the framebuffer for screen drawing
+    Framebuffer framebuffer = Framebuffer(640, 480);
+    Graphics gfx = Graphics(framebuffer);
+
+    // Fill blackish background
+    gfx.fill(Color(32, 32, 32));
+    
+    // Draw whitish rectangle
+    gfx.fillRectangle(Rectangle(32, 32, 120, 64), Color(165, 165, 165));
+
     GPIOHandle blinker[4];
     blinker[0] = GPIOHandle(22);
     blinker[1] = GPIOHandle(23);
