@@ -10,9 +10,15 @@
 #define GPFALT4MASK 0b011
 #define GPFALT5MASK 0b010
 
+GPIOHandle::GPIOHandle() { };
+
 GPIOHandle::GPIOHandle(int pinNumber) {
+    this->SetPin(pinNumber);
+}
+
+void GPIOHandle::SetPin(int pinNumber) {
     this->pinNumber = pinNumber;
-    
+
     // Determine function select address
     if (pinNumber <= 9) {
         this->functionSelectAddress = GPFSEL0;
@@ -62,9 +68,9 @@ void GPIOHandle::SetOutput() {
 
 void GPIOHandle::Write(bool high) {
     if (high) {
-        *this->outputClearAddress |= this->bitMask;
+       *this->outputSetAddress |= this->bitMask;
     } else {
-        *this->outputSetAddress |= this->bitMask;
+        *this->outputClearAddress |= this->bitMask;
     }
 }
 

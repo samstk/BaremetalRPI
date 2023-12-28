@@ -45,9 +45,17 @@ struct GPIOHandle {
         unsigned int functionOffset;
         
     public:
+        /// @brief Creates an uninitialized handle for a GPIO pin.
+        ///        Use SetPin to adjust 
+        GPIOHandle();
+
         /// @brief Initialises the GPIO with reference to the handle
-        /// @param pinNumber The pin number on the board 
+        /// @param pinNumber The pin number on the board (e.g. GPIO 22)
         GPIOHandle(int pinNumber);
+
+        /// @brief Initialises the reference to the GPIO pin.
+        /// @param pinNumber The pin number of the board (e.g. GPIO 22)
+        void SetPin(int pinNumber);
 
         /// @brief Sets the pin to Input Mode
         void SetInput();

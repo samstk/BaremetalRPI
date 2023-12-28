@@ -34,9 +34,9 @@ framebuffer_swap=0
 
 ## Milestones
 Current outlook of objectives (may be subject to change)
-* Basic GPIO Management (Output) - Completed
-* Basic GPIO Management (Input)
-* Writing to Physical Display - Graphics Management
+* Basic GPIO Management (Output) - Completed (Bug may exist)
+* Basic GPIO Management (Input) - Completed
+* Writing to Physical Display - Graphics Management (In progress)
 * Writing fonts to Physical Display - Graphics Management
 * System Timer Counter
 * Generating Interrupt via Timer.
