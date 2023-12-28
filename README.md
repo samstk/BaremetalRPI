@@ -39,8 +39,8 @@ framebuffer_swap=0
 Current outlook of objectives (may be subject to change)
 * Basic GPIO Management (Output) - Completed (Bug may exist)
 * Basic GPIO Management (Input) - Completed
-* Writing to Physical Display - Graphics Management (In progress)
-* Writing fonts to Physical Display - Graphics Management
+* Writing to Physical Display - Graphics Management (Complete)
+* Writing fonts to Physical Display - Graphics Management (In progress)
 * System Timer Counter
 * Generating Interrupt via Timer.
 * Creating Task System - OS Programming
