@@ -19,14 +19,6 @@ extern "C" void main() {
     Graphics gfx = Graphics(framebuffer);
 
     gfx.Fill(Color(32, 32, 32));
-    gfx.FillRectangle(Rectangle(122, 122, 120, 64), Color(165, 165, 165));
-
-    gfx.DrawString(
-        &_systemFont, 
-        Point(32, 32), 
-        String::ParseInt(32, StringConversionFormat::BINARY), 
-        Color(255,255,255)
-        );
 
     GPIOHandle blinker[4];
     blinker[0] = GPIOHandle(22);
@@ -42,10 +34,22 @@ extern "C" void main() {
         blinker[i].SetOutput();
     }
 
+    int time = 0;
     while(true) {
         for(int i = 0; i < 4; i++) {
             blinker[i].Write(input.IsActive());
         }
+
+        gfx.FillRectangle(Rectangle(16, 16, 16*32, 20), Color(32, 32, 32));
+
+        gfx.DrawString(
+            &_systemFont, 
+            Point(16, 16), 
+            String::ParseInt(time, StringConversionFormat::BINARY), 
+            Color(255,255,255)
+            );
+
+        time++;
     }
 }
 
