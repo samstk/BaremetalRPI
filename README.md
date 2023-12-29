@@ -42,5 +42,6 @@ Current outlook of objectives (may be subject to change)
 * Writing to Physical Display - Graphics Management (Complete)
 * Writing fonts to Physical Display - Graphics Management (Complete - ASCII PSF2 only)
 * System Timer Counter - Completed
+* Fix Issue when Running on Hardware with incorrect screen output and lifespan of seconds (In progress)
 * Generating Interrupt via Timer.
 * Creating Task System - OS Programming
