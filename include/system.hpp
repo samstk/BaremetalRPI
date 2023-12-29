@@ -1,6 +1,41 @@
 #ifndef _H_SYSTEM
 #define _H_SYSTEM
 #define NULL 0
+#define PERIPHERAL_BASE       0x3F000000
+
+/// @brief A structure containing all relevant information of the board
+struct RPIBoard {
+    public:
+        /// @brief The amount of RAM available
+        int memoryRAM;
+        
+        /// @brief The starting address for freely available memory
+        char* memoryStart;
+
+        /// @brief The end address for freely available memory
+        char* memoryEnd;
+        
+        /// @brief The next address for allocated memory.
+        char* memoryTarget;
+
+        /// @brief Initialises the information of the board
+        RPIBoard();
+};
+
+/// @brief The system board information 
+static RPIBoard _systemBoard;
+
+/// @brief Reference to the label prior to free memory
+extern "C" void _end();
+
+/// @brief Allocates contiguous memory 
+/// @param size The size of the memory to be allocated.
+/// @return The address in which the memory can be allocated.
+extern "C" void* malloc(int size);
+
+/// @brief Frees the allocated memory
+/// @param alloc The memory that was allocated.
+extern "C" void free(void* alloc);
 
 /// @brief Throws an unknown error
 void crash();

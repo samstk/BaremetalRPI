@@ -1,4 +1,4 @@
-#include <board.hpp>
+#include <system.hpp>
 #ifndef _H_GPIO
 #define _H_GPIO
 

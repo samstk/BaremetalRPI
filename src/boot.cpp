@@ -6,6 +6,9 @@
 
 /// @brief The main function for the first core
 extern "C" void main() {
+    // Initialise the board information
+    _systemBoard = RPIBoard();
+
     // Initialise the framebuffer for screen drawing
     Framebuffer framebuffer = Framebuffer(640, 480);
     
@@ -15,13 +18,15 @@ extern "C" void main() {
     // Creates a graphics object for the framebuffer.
     Graphics gfx = Graphics(framebuffer);
 
-    // Fill blackish background
     gfx.Fill(Color(32, 32, 32));
-        
-    // Draw whitish rectangle
     gfx.FillRectangle(Rectangle(122, 122, 120, 64), Color(165, 165, 165));
 
-    gfx.DrawString(&_systemFont, Point(32, 32), String("Hello World!").Substring(0, 5), Color(255,255,255));
+    gfx.DrawString(
+        &_systemFont, 
+        Point(32, 32), 
+        String::ParseInt(32, StringConversionFormat::BINARY), 
+        Color(255,255,255)
+        );
 
     GPIOHandle blinker[4];
     blinker[0] = GPIOHandle(22);

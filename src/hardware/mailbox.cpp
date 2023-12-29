@@ -1,5 +1,5 @@
 #include <hardware/mailbox.hpp>
-#include <board.hpp>
+#include <system.hpp>
 
 #pragma region struct Mailbox
 
