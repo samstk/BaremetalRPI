@@ -3,6 +3,7 @@
 #include <gfx/gfx.hpp>
 #include <resources/systemfont.hpp>
 #include <hardware/mailbox.hpp>
+#include <data/time.hpp>
 
 /// @brief The main function for the first core
 extern "C" void main() {
@@ -34,24 +35,36 @@ extern "C" void main() {
         blinker[i].SetOutput();
     }
 
-    int time = 0;
+    
     while(true) {
+        TimeSpan currentTime = TimeSpan::GetCurrentTime();
+
         for(int i = 0; i < 4; i++) {
             blinker[i].Write(input.IsActive());
         }
 
-        gfx.FillRectangle(Rectangle(16, 16, 16*48, 20), Color(32, 32, 32));
+        gfx.FillRectangle(Rectangle(16, 16, 16*48, 40), Color(32, 32, 32));
+
         String timeString = 
-            String("Time: ") + 
-            String::ParseInt(time, StringConversionFormat::HEX);
+            String::ParseLong(currentTime.ticks, StringConversionFormat::ORIGINAL);
+
+        String memoryString = String::ParseLong(
+            (unsigned long)timeString.data, StringConversionFormat::HEX
+        );
 
         gfx.DrawString(
             &_systemFont, 
             Point(16, 16), 
-            timeString,
+            String("Time: ") + timeString,
             Color(255,255,255)
             );
-        time++;
+
+        gfx.DrawString(
+            &_systemFont, 
+            Point(16, 36), 
+            String("Memory Position: ") + memoryString,
+            Color(255,255,255)
+            );
     }
 }
 

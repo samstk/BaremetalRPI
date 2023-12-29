@@ -132,8 +132,6 @@ void Graphics::FillRectangle(Rectangle region, Color color) {
 void Graphics::DrawChar(PSF2Font* font, Point location, char c, Color color) {
     unsigned int *buffer = this->buffer + (location.y * this->bufferWidth + location.x);
     
-    // PCF2 Fonts are defined 
-
     char* glyph = font->GetGlyph(c);
         
     char glyphRow = *glyph; 

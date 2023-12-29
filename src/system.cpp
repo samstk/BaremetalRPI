@@ -29,11 +29,11 @@ RPIMachineInfo::RPIMachineInfo() {
 
 static RPIMachineInfo _systemInfo;
 
-extern "C" void initSystemInfo() {
+void initSystemInfo() {
     _systemInfo = RPIMachineInfo();
 }
 
-extern "C" RPIMachineInfo getSystemInfo() {
+RPIMachineInfo getSystemInfo() {
     return _systemInfo;
 }
 

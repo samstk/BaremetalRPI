@@ -23,10 +23,10 @@ struct RPIMachineInfo {
 };
 
 /// @brief Initialises the system board information
-extern "C" void initSystemInfo();
+void initSystemInfo();
 
 /// @brief Gets the system board information
-extern "C" RPIMachineInfo getSystemInfo();
+RPIMachineInfo getSystemInfo();
 
 /// @brief Reference to the label prior to free memory
 extern "C" void* _end;

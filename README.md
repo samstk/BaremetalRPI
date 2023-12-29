@@ -41,6 +41,6 @@ Current outlook of objectives (may be subject to change)
 * Basic GPIO Management (Input) - Completed
 * Writing to Physical Display - Graphics Management (Complete)
 * Writing fonts to Physical Display - Graphics Management (Complete - ASCII PSF2 only)
-* System Timer Counter
+* System Timer Counter - Completed
 * Generating Interrupt via Timer.
 * Creating Task System - OS Programming

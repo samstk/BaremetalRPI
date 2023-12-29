@@ -27,6 +27,10 @@ struct String {
         bool _allocated = false;
 
     public:
+        /// @brief Constructs a string from the given original
+        /// @param string The original string
+        String(const String &string);
+
         /// @brief Constructs a string with a newly allocated character buffer
         /// @param length The character buffer's size and length of the string
         String(int length);

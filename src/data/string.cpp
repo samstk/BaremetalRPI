@@ -2,6 +2,20 @@
 #include <system.hpp>
 
 #pragma region struct String
+
+/// @brief Measures the length of a system-defined string
+/// @param data The system-defined string
+/// @return The length of the string
+int measureString(char* data) {
+    // Calculate length
+    int length = 0;
+    while (*data != '\0') {
+        data++;
+        length++;
+    }
+    return length;
+}
+
 String::~String() {
     if (this->_allocated) {
         free(this->data);
@@ -12,6 +26,14 @@ String::String(int length) {
     this->data = (char*) malloc(length);
     this->_length = length;
     this->_allocated = true;
+}
+
+String::String(const String &string) {
+    int length = string._length == -1 ? measureString(string.data) : string._length;
+    this->data = (char*) malloc(length);
+    this->_length = length;
+    this->_allocated = true;
+    memcpy(this->data, string.data, length);
 }
 
 String::String(char *data) {
@@ -46,14 +68,7 @@ String String::operator+(String other) {
 
 int String::GetLength() {
     if (this->_length == -1) { 
-        // Calculate length
-        int length = 0;
-        char* dat = this->data;
-        while (*dat != '\0') {
-            dat++;
-            length++;
-        }
-        this->_length = length;
+        this->_length = measureString(this->data);
     }
     return this->_length;
 }
@@ -193,7 +208,7 @@ String String::ParseLong(unsigned long value, StringConversionFormat format, int
     int length = 0;
 
     // Calculate length of representation
-    int displayValue = value;
+    unsigned long displayValue = value;
     do {
         length++;
         value /= 10;
@@ -201,14 +216,13 @@ String String::ParseLong(unsigned long value, StringConversionFormat format, int
 
     // Create string from integer value
     String string = String(length);
-    char* data = string.data + length - 1;
+    char* data = string.data + (length - 1);
     value = displayValue;
     do {
         *data = (char)(value % 10) + '0';
         data--;
         value /= 10;
     } while (value > 0);
-
     return string;
 }
 #pragma endregion
