@@ -21,8 +21,7 @@ extern "C" void main() {
     // Draw whitish rectangle
     gfx.FillRectangle(Rectangle(122, 122, 120, 64), Color(165, 165, 165));
 
-    // Draw white text
-    gfx.DrawString(&_systemFont, Point(16, 16), (char*) "Hello World!", Color(255,255,255));
+    gfx.DrawString(&_systemFont, Point(32, 32), String("Hello World!").Substring(0, 5), Color(255,255,255));
 
     GPIOHandle blinker[4];
     blinker[0] = GPIOHandle(22);

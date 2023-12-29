@@ -1,6 +1,7 @@
 #ifndef _H_GFX
 #define _H_GFX
 #include <gfx/font.hpp>
+#include <data/string.hpp>
 struct Framebuffer;
 
 struct Color {
@@ -153,7 +154,7 @@ struct Graphics {
         /// @param startLocation The location to draw at
         /// @param text The text to draw
         /// @param color The color to draw the text as
-        void DrawString(PSF2Font* font, Point startLocation, char* text, Color color);
+        void DrawString(PSF2Font* font, Point startLocation, String text, Color color);
 };
 
 #include <hardware/framebuffer.hpp>

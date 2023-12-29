@@ -1,4 +1,5 @@
 #include <gfx/gfx.hpp>
+#include <data/string.hpp>
 
 #pragma region struct Point & Size
 Point::Point() {
@@ -166,11 +167,15 @@ void Graphics::DrawChar(PSF2Font* font, Point location, char c, Color color) {
     }
 };
 
-void Graphics::DrawString(PSF2Font* font, Point startLocation, char* text, Color color) {
+void Graphics::DrawString(PSF2Font* font, Point startLocation, String text, Color color) {
     int x = startLocation.x;
     int y = startLocation.y;
+    int length = text.GetLength();
+    char* data = text.data;
     char c;
-    while ((c = *text) != '\0') {
+    while (length > 0) {
+        c = *data;
+
         if (c == '\n') {
             x = startLocation.x;
             y += font->header->characterHeight;
@@ -184,7 +189,8 @@ void Graphics::DrawString(PSF2Font* font, Point startLocation, char* text, Color
         }
 
         x += font->header->characterWidth;
-        text++;
+        data++;
+        length--;
     }
 }
 #pragma endregion
