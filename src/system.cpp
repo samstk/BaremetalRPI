@@ -13,7 +13,7 @@ struct MemoryAllocationMetadata {
 };
 
 #pragma region struct RPIBoard
-RPIBoard::RPIBoard() {
+RPIMachineInfo::RPIMachineInfo() {
     this->memoryRAM = 0x20000000; // 512 megabytes (temporary value)
     this->memoryStart = (char*) &_end;
     this->memoryEnd = this->memoryStart + this->memoryRAM;
@@ -26,6 +26,16 @@ RPIBoard::RPIBoard() {
     startMetadata->nextAllocationAccessed = false;
 }
 #pragma endregion
+
+static RPIMachineInfo _systemInfo;
+
+extern "C" void initSystemInfo() {
+    _systemInfo = RPIMachineInfo();
+}
+
+extern "C" RPIMachineInfo getSystemInfo() {
+    return _systemInfo;
+}
 
 #define MALLOC_METADATASIZE 4 
 
@@ -54,13 +64,13 @@ extern "C" void* malloc(int size) {
     size = ((size + 3) / 4) * 4;
 
     // Find the next available allocation
-    MemoryAllocationMetadata* metadata = (MemoryAllocationMetadata*) _systemBoard.memoryStart;
+    MemoryAllocationMetadata* metadata = (MemoryAllocationMetadata*) getSystemInfo().memoryStart;
     
     while(metadata->allocated || metadata->size < size) {
         metadata = (MemoryAllocationMetadata*) 
             ((char*) metadata + MALLOC_METADATASIZE + metadata->size);
 
-        if ((void*) metadata >= _systemBoard.memoryEnd)
+        if ((void*) metadata >= getSystemInfo().memoryEnd)
             return NULL;
     }
 

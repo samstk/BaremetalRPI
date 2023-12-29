@@ -7,7 +7,7 @@
 /// @brief The main function for the first core
 extern "C" void main() {
     // Initialise the board information
-    _systemBoard = RPIBoard();
+    initSystemInfo();
 
     // Initialise the framebuffer for screen drawing
     Framebuffer framebuffer = Framebuffer(640, 480);
@@ -40,15 +40,17 @@ extern "C" void main() {
             blinker[i].Write(input.IsActive());
         }
 
-        gfx.FillRectangle(Rectangle(16, 16, 16*32, 20), Color(32, 32, 32));
+        gfx.FillRectangle(Rectangle(16, 16, 16*48, 20), Color(32, 32, 32));
+        String timeString = 
+            String("Time: ") + 
+            String::ParseInt(time, StringConversionFormat::HEX);
 
         gfx.DrawString(
             &_systemFont, 
             Point(16, 16), 
-            String::ParseInt(time, StringConversionFormat::BINARY), 
+            timeString,
             Color(255,255,255)
             );
-
         time++;
     }
 }

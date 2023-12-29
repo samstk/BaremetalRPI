@@ -52,6 +52,8 @@ struct String {
         String(const char* data, int length);
 
         ~ String();
+
+        String operator +(String other);
         
         /// @brief Gets the length of the string
         /// @return The length of the string
@@ -84,7 +86,7 @@ struct String {
         /// @param format The format to convert to
         /// @param bits The number of bits storing the value
         /// @return The converted string
-        static String ParseLong(long value, StringConversionFormat format, int bits);
+        static String ParseLong(long value, StringConversionFormat format, int bits=64);
 
         /// @brief Converts an integer to a string value.
         /// @param value The value to convert
@@ -97,7 +99,7 @@ struct String {
         /// @param format The format to convert to
         /// @param bits The number of bits storing the value
         /// @return The converted string
-        static String ParseLong(unsigned long value, StringConversionFormat format, int bits);
+        static String ParseLong(unsigned long value, StringConversionFormat format, int bits=64);
 };
 
 #endif

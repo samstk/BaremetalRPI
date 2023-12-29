@@ -4,7 +4,7 @@
 #define PERIPHERAL_BASE       0x3F000000
 
 /// @brief A structure containing all relevant information of the board
-struct RPIBoard {
+struct RPIMachineInfo {
     public:
         /// @brief The amount of RAM available
         int memoryRAM;
@@ -19,14 +19,17 @@ struct RPIBoard {
         char* memoryTarget;
 
         /// @brief Initialises the information of the board
-        RPIBoard();
+        RPIMachineInfo();
 };
 
-/// @brief The system board information 
-static RPIBoard _systemBoard;
+/// @brief Initialises the system board information
+extern "C" void initSystemInfo();
+
+/// @brief Gets the system board information
+extern "C" RPIMachineInfo getSystemInfo();
 
 /// @brief Reference to the label prior to free memory
-extern "C" void _end();
+extern "C" void* _end;
 
 /// @brief Allocates contiguous memory 
 /// @param size The size of the memory to be allocated.

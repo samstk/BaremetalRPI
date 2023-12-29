@@ -32,6 +32,18 @@ String::String(const char *data, int length) : String::String(data) {
     this->_length = length;
 }
 
+String String::operator+(String other) {
+    int thisLength = this->GetLength();
+    int otherLength = other.GetLength();
+    
+    String combined = String(thisLength + otherLength);
+    char* dest = combined.data;
+    memcpy(dest, this->data, thisLength);
+    dest += thisLength;
+    memcpy(dest, other.data, otherLength);
+    return combined;
+}
+
 int String::GetLength() {
     if (this->_length == -1) { 
         // Calculate length
@@ -132,7 +144,7 @@ String ParseLongHex(unsigned long value, int bits) {
     return string;
 }
 
-String String::ParseLong(long value, StringConversionFormat format, int bits=64) {
+String String::ParseLong(long value, StringConversionFormat format, int bits) {
     // Use correct conversion method
     if (format == StringConversionFormat::BINARY) {
         return ParseLongBinary((unsigned long)value, bits);
@@ -170,7 +182,7 @@ String String::ParseLong(long value, StringConversionFormat format, int bits=64)
     return string;
 }
 
-String String::ParseLong(unsigned long value, StringConversionFormat format, int bits=64) {
+String String::ParseLong(unsigned long value, StringConversionFormat format, int bits) {
     // Use correct conversion method
     if (format == StringConversionFormat::BINARY) {
         return ParseLongBinary(value, bits);
