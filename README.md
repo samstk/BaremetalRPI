@@ -35,6 +35,8 @@ disable_overscan=1
 framebuffer_swap=0
 ```
 
+If any problems occur, then it may be an issue with the hardware or power supply.
+
 ## Milestones
 Current outlook of objectives (may be subject to change)
 * Basic GPIO Management (Output) - Completed (Bug may exist)
@@ -42,6 +44,5 @@ Current outlook of objectives (may be subject to change)
 * Writing to Physical Display - Graphics Management (Complete)
 * Writing fonts to Physical Display - Graphics Management (Complete - ASCII PSF2 only)
 * System Timer Counter - Completed
-* Fix Issue when Running on Hardware with incorrect screen output and lifespan of seconds (In progress)
 * Generating Interrupt via Timer.
 * Creating Task System - OS Programming
