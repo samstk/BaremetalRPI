@@ -39,11 +39,12 @@ extern "C" void main() {
     while(true) {
         TimeSpan currentTime = TimeSpan::GetCurrentTime();
 
+        bool isActive = input.IsActive();
         for(int i = 0; i < 4; i++) {
-            blinker[i].Write(input.IsActive());
+            blinker[i].Write(isActive);
         }
 
-        gfx.FillRectangle(Rectangle(16, 16, 16*48, 40), Color(32, 32, 32));
+        gfx.FillRectangle(Rectangle(16, 16, 16*48, 80), Color(32, 32, 32));
 
         String timeString = 
             String::ParseLong(currentTime.ticks, StringConversionFormat::ORIGINAL);
@@ -65,6 +66,36 @@ extern "C" void main() {
             String("Memory Position: ") + memoryString,
             Color(255,255,255)
             );
+
+        if (isActive) {
+            gfx.DrawString(
+                &_systemFont, 
+                Point(16, 56), 
+                "Input is Active",
+                Color(255,255,255)
+                );    
+        } else {
+                gfx.DrawString(
+                &_systemFont, 
+                Point(16, 56), 
+                "Input is not Active",
+                Color(200,200,200)
+                );
+        }
+
+        TimeSpan timeToWait = TimeSpan(250, TimeUnit::MILLISECOND);
+
+        timeString = 
+            String::ParseLong(timeToWait.ticks, StringConversionFormat::ORIGINAL);
+
+        gfx.DrawString(
+            &_systemFont, 
+            Point(16, 76), 
+            String("Time to Wait: ") + timeString,
+            Color(255,255,255)
+            );
+
+        timeToWait.SpinWait();
     }
 }
 

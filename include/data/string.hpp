@@ -24,12 +24,17 @@ struct String {
         int _length = -1;
 
         /// @brief True if an allocation was necessary for the string.
-        bool _allocated = false;
+        bool _allocated = false; 
 
     public:
         /// @brief Constructs a string from the given original
         /// @param string The original string
         String(const String &string);
+
+        /// @brief Constructs a new string from the given original
+        /// @param string The original string
+        /// @return The new string that was assigned
+        String& operator=(const String &string);
 
         /// @brief Constructs a string with a newly allocated character buffer
         /// @param length The character buffer's size and length of the string

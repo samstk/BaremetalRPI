@@ -5,6 +5,10 @@ SystemTimer* SystemTimer::GetSystemTimer() {
     return (SystemTimer*) (PERIPHERAL_BASE + SYSTEMTIMER_BASE);
 }
 
+unsigned int SystemTimer::GetSystemTimerFrequency() {
+    return SYSTEMTIMER_FREQ;
+}
+
 unsigned long SystemTimer::GetSystemTime() {
     SystemTimer* timer = SystemTimer::GetSystemTimer();
 

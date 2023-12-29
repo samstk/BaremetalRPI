@@ -36,6 +36,16 @@ String::String(const String &string) {
     memcpy(this->data, string.data, length);
 }
 
+String& String::operator=(const String &string) { 
+    this->~String();
+    int length = string._length == -1 ? measureString(string.data) : string._length;
+    this->data = (char*) malloc(length);
+    this->_length = length;
+    this->_allocated = true;
+    memcpy(this->data, string.data, length);
+    return *this;
+}
+
 String::String(char *data) {
     // Store direct reference as it should not change.
     this->data = data;
