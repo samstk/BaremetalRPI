@@ -94,13 +94,13 @@ Graphics::Graphics(Framebuffer framebuffer) {
     this->bufferHeight = framebuffer.resolution.height;
 }
 
-int Graphics::getBufferSize() {
+int Graphics::GetBufferSize() {
     return this->bufferWidth * this->bufferHeight * 4;
 }
 
-void Graphics::fill(Color color) {
+void Graphics::Fill(Color color) {
     unsigned int *buffer = this->buffer;
-    int size = this->getBufferSize();
+    int size = this->GetBufferSize();
 
     while(size-- > 0) {
         *buffer = color.data;
@@ -108,7 +108,7 @@ void Graphics::fill(Color color) {
     }
 }
 
-void Graphics::fillRectangle(Rectangle region, Color color) {
+void Graphics::FillRectangle(Rectangle region, Color color) {
     unsigned int *buffer = this->buffer;
 
     int w = region.width;
@@ -125,6 +125,66 @@ void Graphics::fillRectangle(Rectangle region, Color color) {
 
         // Calculate offset to next print line 
         buffer += (this->bufferWidth - w);
+    }
+}
+
+void Graphics::DrawChar(PSF2Font* font, Point location, char c, Color color) {
+    unsigned int *buffer = this->buffer + (location.y * this->bufferWidth + location.x);
+    
+    // PCF2 Fonts are defined 
+
+    char* glyph = font->GetGlyph(c);
+        
+    char glyphRow = *glyph; 
+    int skip = 8;
+
+    for(unsigned int y = 0; y < font->header->characterHeight; y++) {
+        for(unsigned int x = 0; x < font->header->characterWidth; x++) {
+            if (skip == 0) {
+                // Must swap to next glyph byte
+                glyph++;
+                glyphRow = *glyph; 
+                skip = 8;
+            }
+            
+            int mask = 1 << (7 - x % 8);
+            if (glyphRow & mask) {
+                // Must draw pixel
+                *buffer = color.data;
+            }
+            
+
+            skip--;
+            buffer++;
+        }
+
+        // Must swap to next glyph byte on new row
+        glyph++;
+        glyphRow = *glyph; 
+        skip = 8;
+        buffer += this->bufferWidth - font->header->characterWidth;
+    }
+};
+
+void Graphics::DrawString(PSF2Font* font, Point startLocation, char* text, Color color) {
+    int x = startLocation.x;
+    int y = startLocation.y;
+    char c;
+    while ((c = *text) != '\0') {
+        if (c == '\n') {
+            x = startLocation.x;
+            y += font->header->characterHeight;
+        }
+
+        if (font->HasCharacterGlyph(c)) {
+            this->DrawChar(font, Point(x,y), c, color);
+        } else {
+            // Assumes ? is within the font
+            this->DrawChar(font, Point(x,y), '?', color);
+        }
+
+        x += font->header->characterWidth;
+        text++;
     }
 }
 #pragma endregion

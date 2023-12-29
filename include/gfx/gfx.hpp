@@ -1,5 +1,6 @@
 #ifndef _H_GFX
 #define _H_GFX
+#include <gfx/font.hpp>
 struct Framebuffer;
 
 struct Color {
@@ -111,6 +112,7 @@ struct Rectangle {
         Rectangle(int x, int y, int width, int height);
 };
 
+/// @brief A graphics structure for manipulating screen displays
 struct Graphics {
     public: 
         /// @brief The address of the buffer
@@ -128,16 +130,30 @@ struct Graphics {
 
         /// @brief Calculates the total size of the buffer
         /// @return The size of the buffer
-        int getBufferSize();
+        int GetBufferSize();
 
         /// @brief Fills the buffer with the given colour
         /// @param color The color to fill with
-        void fill(Color color);
+        void Fill(Color color);
 
         /// @brief Fills a region of the buffer with the given colour
         /// @param region The region to fill
         /// @param color The color to fill with
-        void fillRectangle(Rectangle region, Color color);
+        void FillRectangle(Rectangle region, Color color);
+
+        /// @brief Draws the given character at a given position
+        /// @param font The font to draw with
+        /// @param location The location to draw at
+        /// @param c The character to draw
+        /// @param color The color to draw the text as
+        void DrawChar(PSF2Font* font, Point location, char c, Color color);
+
+        /// @brief Draws the given text at a given position
+        /// @param font The font to draw with
+        /// @param startLocation The location to draw at
+        /// @param text The text to draw
+        /// @param color The color to draw the text as
+        void DrawString(PSF2Font* font, Point startLocation, char* text, Color color);
 };
 
 #include <hardware/framebuffer.hpp>

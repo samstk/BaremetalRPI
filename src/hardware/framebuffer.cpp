@@ -41,7 +41,7 @@ Framebuffer::Framebuffer(int width, int height) {
         unsigned int fbPointer = *buffer_pointer;
         if (fbPointer != 0) {
             // Take conversion from BUS address to physical address
-            this->buffer = (unsigned int *)(fbPointer & 0x3FFFFFFF);
+            this->buffer = (unsigned int *)((unsigned long)(fbPointer & 0x3FFFFFFF));
             return;
         }
     }

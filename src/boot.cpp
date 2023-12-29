@@ -1,19 +1,28 @@
 #include <hardware/gpio.hpp> 
 #include <hardware/framebuffer.hpp>
 #include <gfx/gfx.hpp>
+#include <resources/systemfont.hpp>
 #include <hardware/mailbox.hpp>
 
 /// @brief The main function for the first core
 extern "C" void main() {
     // Initialise the framebuffer for screen drawing
     Framebuffer framebuffer = Framebuffer(640, 480);
+    
+    // Initialise the system font
+    _systemFont = PSF2Font((char*) _systemFontBuffer);
+
+    // Creates a graphics object for the framebuffer.
     Graphics gfx = Graphics(framebuffer);
 
     // Fill blackish background
-    gfx.fill(Color(32, 32, 32));
-    
+    gfx.Fill(Color(32, 32, 32));
+        
     // Draw whitish rectangle
-    gfx.fillRectangle(Rectangle(32, 32, 120, 64), Color(165, 165, 165));
+    gfx.FillRectangle(Rectangle(122, 122, 120, 64), Color(165, 165, 165));
+
+    // Draw white text
+    gfx.DrawString(&_systemFont, Point(16, 16), (char*) "Hello World!", Color(255,255,255));
 
     GPIOHandle blinker[4];
     blinker[0] = GPIOHandle(22);
@@ -22,9 +31,9 @@ extern "C" void main() {
     blinker[3] = GPIOHandle(20);
 
     GPIOHandle input(21);
-    
+        
     input.SetInput();
-    
+        
     for(int i = 0; i < 4; i++) {
         blinker[i].SetOutput();
     }
