@@ -60,6 +60,7 @@ void GPIOHandle::SetInput() {
 }
 
 void GPIOHandle::SetOutput() {
+    crash("GPIO invalid");
     unsigned int currentFunction = *this->functionSelectAddress;
     currentFunction &= ~(GPFCLEARMASK << this->functionOffset);
     currentFunction |= GPFOUTPUTMASK << this->functionOffset;

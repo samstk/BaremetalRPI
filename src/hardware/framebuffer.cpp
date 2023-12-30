@@ -8,6 +8,11 @@
 #define PROP_VIRTUAL_OFFSET     0x00048009
 #define PROP_PALETTE            0x0004800B
 #define PROP_ALLOCATE_BUFFER    0x00040001
+
+Framebuffer::Framebuffer() {
+    
+}
+
 Framebuffer::Framebuffer(int width, int height) {
     this->resolution = Size(width, height);
 

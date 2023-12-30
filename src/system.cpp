@@ -1,5 +1,11 @@
 #include <system.hpp>
 #include <hardware/mailbox.hpp>
+#include <data/string.hpp>
+#include <hardware/framebuffer.hpp>
+#include <gfx/gfx.hpp>
+#include <gfx/font.hpp>
+#include <resources/systemfont.hpp>
+#include <resources/funcmap.hpp>
 
 /// @brief Metadata for memory allocation
 struct MemoryAllocationMetadata {
@@ -7,9 +13,9 @@ struct MemoryAllocationMetadata {
         /// @brief The size of the allocation
         int size;
         /// @brief True if the metadata represents allocated memory 
-        bool allocated;
+        int allocated;
         /// @brief True if the next allocation metadata has already been accessed.
-        bool nextAllocationAccessed;
+        int nextAllocationAccessed;
 };
 
 #pragma region struct RPIBoard
@@ -27,6 +33,32 @@ RPIMachineInfo::RPIMachineInfo() {
 }
 #pragma endregion
 
+#pragma region class Stacktrace
+struct Stackframe {
+    Stackframe* ebp;
+    unsigned int eip;
+};
+
+Stacktrace::Stacktrace() {
+    struct Stackframe *stk;
+    asm volatile("mov %0, sp" : "=r"(stk));
+    
+    // Clear address references
+    for(int i = 0; i < SYSTEM_STACKTRACE_MAXSTEPS; i++) {
+        this->stack[i] = NULL;
+    }
+
+    // Travel through stack frames
+    int index = 0;
+    this->stack[index++] = stk->eip - 4;
+
+    while(stk->ebp && index < SYSTEM_STACKTRACE_MAXSTEPS) {
+        stk = stk->ebp;
+        this->stack[index++] = stk->eip - 4;
+    }
+}
+#pragma endregion
+
 static RPIMachineInfo _systemInfo;
 
 void initSystemInfo() {
@@ -37,7 +69,64 @@ RPIMachineInfo getSystemInfo() {
     return _systemInfo;
 }
 
-#define MALLOC_METADATASIZE 4 
+int getCoreId() {
+    register int coreId;
+    asm volatile("mrs %0, mpidr_el1" : "=r"(coreId));
+    return coreId & 0b11;
+}
+
+#pragma region struct FunctionLabel
+FunctionLabel::FunctionLabel() {
+    this->name = String();
+    this->address = NULL;
+}
+
+FunctionLabel::FunctionLabel(unsigned int programAddress) {
+    char* funcmap = getFunctionMap();
+
+    // All definitions are in the form of:
+    // XXXXXXXXXXXXXXXX <funcname>:
+
+    // Continue to check until there are no longer any valid pointers.
+
+    char* prevLabel = funcmap;
+    unsigned long prevAddress = String(funcmap, 16).ToUInt64(StringConversionFormat::HEX);
+    
+    while (*funcmap == '0') {
+        String location = String(funcmap, 16);
+        
+        unsigned long address = location.ToUInt64(StringConversionFormat::HEX);
+        
+        if (programAddress <= address) {
+            this->address = prevAddress;
+            funcmap = prevLabel;
+            funcmap += 18;
+            int length = 0;
+            while (*funcmap != '>') {
+                length++;
+                funcmap++;
+            }
+            this->name = String(prevLabel+18, length);
+            return;
+        }
+
+        prevLabel = funcmap;
+        prevAddress = address;
+
+        // Skip to next entry.
+        while (*funcmap != '\n') {
+            funcmap++;
+        }    
+        funcmap++;
+    }
+
+    this->name = "unknown";
+    this->address = programAddress;
+}
+#pragma endregion
+
+
+#define MALLOC_METADATASIZE sizeof(MemoryAllocationMetadata)
 
 extern "C" void* malloc(int size) {
     // Simple implementation of malloc (slow but simple, temporary solution only)
@@ -59,19 +148,21 @@ extern "C" void* malloc(int size) {
     //
     // Then the next allocation (of size 4 or below) will go to the first element.
 
-
     // Round size up (align 4) so that everything is aligned to 32-bits.
     size = ((size + 3) / 4) * 4;
 
+    RPIMachineInfo systemInfo = getSystemInfo();
+
     // Find the next available allocation
-    MemoryAllocationMetadata* metadata = (MemoryAllocationMetadata*) getSystemInfo().memoryStart;
-    
+    MemoryAllocationMetadata* metadata = (MemoryAllocationMetadata*) systemInfo.memoryStart;
+
     while(metadata->allocated || metadata->size < size) {
         metadata = (MemoryAllocationMetadata*) 
             ((char*) metadata + MALLOC_METADATASIZE + metadata->size);
 
-        if ((void*) metadata >= getSystemInfo().memoryEnd)
-            return NULL;
+        if ((void*) metadata >= systemInfo.memoryEnd) {
+            crash("Ran out of Memory");
+        }
     }
 
     // Mark allocation as allocated
@@ -102,7 +193,67 @@ extern "C" void free(void* alloc) {
     metadata->allocated = false;
 }
 
+static Framebuffer _systemFramebuffer;
+
+void setSystemFramebuffer(Framebuffer buffer) {
+    _systemFramebuffer = buffer;
+}
+
+Framebuffer getSystemFramebuffer() {
+    return _systemFramebuffer;
+}
+
 void crash() {
+    crash("Unknown error occurred");
+}
+
+void crash(String errorMessage) {
+    Framebuffer buffer = getSystemFramebuffer();
+    Graphics crashGfx = Graphics(buffer);
+    crashGfx.Fill(Color(0, 0, 0));
+    PSF2Font systemFont = getSystemFont();
+    int y = 16;
+    Color white = Color(255,255,255);
+    
+    crashGfx.DrawString(&systemFont, Point(16, y), String("Fatal Error: ") + errorMessage, 
+        white);
+    
+    y += 20;
+    unsigned int coreId = getCoreId();
+    String coreDiagnostic = String("Executing Core ID: ") + String::ParseInt(coreId);
+    crashGfx.DrawString(&systemFont, Point(16, y), coreDiagnostic, white);
+
+    y += 20;
+    crashGfx.DrawString(&systemFont, Point(16, y), "Call Stack:", white);
+
+    String at = "@ : ";
+
+    Stacktrace trace = Stacktrace();
+
+    for(int i = 0; i < SYSTEM_STACKTRACE_MAXSTEPS && i < 12; i++) {
+        y += 20;
+
+        unsigned int address = trace.stack[i];
+
+        if (address == NULL) {
+            break;
+        }
+
+        FunctionLabel label = FunctionLabel(address);
+        String printedString = at + String::ParseInt(address, StringConversionFormat::HEX);
+        String printedString2 = printedString + (String(" <") + label.name + String("+"));
+        
+        unsigned int offset = address - label.address;
+        String printedString3 = printedString2
+            + String::ParseInt(offset, StringConversionFormat::HEX)
+                .Substring(4) // It is expected that a function does not exceed 0xFFFF. 
+            + String(">");
+
+        crashGfx.DrawString(&systemFont, Point(16, y), 
+            printedString3, 
+            white);
+    }
+
     while (1);
 }
 

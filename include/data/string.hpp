@@ -31,10 +31,8 @@ struct String {
         /// @param string The original string
         String(const String &string);
 
-        /// @brief Constructs a new string from the given original
-        /// @param string The original string
-        /// @return The new string that was assigned
-        String& operator=(const String &string);
+        /// @brief Constructs an empty NULL string.
+        String();
 
         /// @brief Constructs a string with a newly allocated character buffer
         /// @param length The character buffer's size and length of the string
@@ -84,31 +82,40 @@ struct String {
         /// @return The new string with the sub section
         String Substring(int fromIndex, int length);
 
-        /// @brief Converts an integer to a string value.
-        /// @param value The value to convert
-        /// @param format The format to convert to
-        /// @return The converted string
-        static String ParseInt(int value, StringConversionFormat format);
-        
-        /// @brief Converts an integer to a string value.
-        /// @param value The value to convert
-        /// @param format The format to convert to
-        /// @param bits The number of bits storing the value
-        /// @return The converted string
-        static String ParseLong(long value, StringConversionFormat format, int bits=64);
+        /// @brief Converts all leading digits to a unsigned long value
+        /// @param format The format of the digits
+        /// @return The unsigned long value held in the string
+        unsigned long ToUInt64(StringConversionFormat format = StringConversionFormat::ORIGINAL);
 
         /// @brief Converts an integer to a string value.
         /// @param value The value to convert
         /// @param format The format to convert to
         /// @return The converted string
-        static String ParseInt(unsigned int value, StringConversionFormat format);
+        static String ParseInt(int value, 
+            StringConversionFormat format = StringConversionFormat::ORIGINAL);
         
         /// @brief Converts an integer to a string value.
         /// @param value The value to convert
         /// @param format The format to convert to
         /// @param bits The number of bits storing the value
         /// @return The converted string
-        static String ParseLong(unsigned long value, StringConversionFormat format, int bits=64);
+        static String ParseLong(long value, 
+            StringConversionFormat format = StringConversionFormat::ORIGINAL, int bits=64);
+
+        /// @brief Converts an integer to a string value.
+        /// @param value The value to convert
+        /// @param format The format to convert to
+        /// @return The converted string
+        static String ParseInt(unsigned int value, 
+            StringConversionFormat format = StringConversionFormat::ORIGINAL);
+        
+        /// @brief Converts an integer to a string value.
+        /// @param value The value to convert
+        /// @param format The format to convert to
+        /// @param bits The number of bits storing the value
+        /// @return The converted string
+        static String ParseLong(unsigned long value, 
+            StringConversionFormat format = StringConversionFormat::ORIGINAL, int bits=64);
 };
 
 #endif

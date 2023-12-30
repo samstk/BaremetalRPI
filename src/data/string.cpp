@@ -36,14 +36,9 @@ String::String(const String &string) {
     memcpy(this->data, string.data, length);
 }
 
-String& String::operator=(const String &string) { 
-    this->~String();
-    int length = string._length == -1 ? measureString(string.data) : string._length;
-    this->data = (char*) malloc(length);
-    this->_length = length;
-    this->_allocated = true;
-    memcpy(this->data, string.data, length);
-    return *this;
+String::String() {
+    this->data = NULL;
+    this->_length = 0;
 }
 
 String::String(char *data) {
@@ -62,6 +57,8 @@ String::String(char *data, int length) : String::String(data) {
 
 String::String(const char *data, int length) : String::String(data) {
     this->_length = length;
+    this->_allocated = false;
+    this->data = (char*)data;
 }
 
 String String::operator+(String other) {
@@ -93,6 +90,54 @@ String String::Substring(int fromIndex) {
 
 String String::Substring(int fromIndex, int length) {
     return String(this->data + fromIndex, length);
+}
+
+unsigned long String::ToUInt64(StringConversionFormat format) {
+    int length = this->GetLength();
+    unsigned long value = 0;
+    if (format == StringConversionFormat::ORIGINAL) {
+        for(int i = 0; i < length; i++) {
+            char c = this->data[i];
+            if (c >= '0' && c <= '9') {
+                value *= 10;
+                int digit = (int)(c - '0');
+                value += digit;
+            } else {
+                break;
+            }
+        }
+    } else if (format == StringConversionFormat::HEX) {
+        for(int i = 0; i < length; i++) {
+            char c = this->data[i];
+            if (c >= '0' && c <= '9') {
+                value *= 16;
+                int digit = (int)(c - '0');
+                value += digit;
+            } else if (c >= 'A' && c <= 'F') {
+                value *= 16;
+                int digit = (int)(c - 'A' + 10);
+                value += digit;
+            } else if (c >= 'a' && c <= 'f') {
+                value *= 16;
+                int digit = (int)(c - 'a' + 10);
+                value += digit;
+            } else {
+                break;
+            }
+        }
+    } else if (format == StringConversionFormat::BINARY) {
+        for(int i = 0; i < length; i++) {
+            char c = this->data[i];
+            if (c >= '0' && c <= '1') {
+                value *= 2;
+                int digit = (int)(c - '0');
+                value += digit;
+            } else {
+                break;
+            }
+        }
+    }
+    return value;
 }
 
 
@@ -136,7 +181,7 @@ String String::ParseInt(int value, StringConversionFormat format) {
 }
 
 String String::ParseInt(unsigned int value, StringConversionFormat format) {
-    return String::ParseLong((long)value, format, 32);
+    return String::ParseLong((unsigned long)value, format, 32);
 }
 
 String ParseLongBinary(unsigned long value, int bits) {
@@ -226,7 +271,7 @@ String String::ParseLong(unsigned long value, StringConversionFormat format, int
 
     // Create string from integer value
     String string = String(length);
-    char* data = string.data + (length - 1);
+    char* data = string.data + length - 1;
     value = displayValue;
     do {
         *data = (char)(value % 10) + '0';

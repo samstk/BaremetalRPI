@@ -12,9 +12,11 @@ extern "C" void main() {
 
     // Initialise the framebuffer for screen drawing
     Framebuffer framebuffer = Framebuffer(640, 480);
+    setSystemFramebuffer(framebuffer); // For error messages
     
     // Initialise the system font
     _systemFont = PSF2Font((char*) _systemFontBuffer);
+    setSystemFont(_systemFont);
 
     // Creates a graphics object for the framebuffer.
     Graphics gfx = Graphics(framebuffer);
@@ -30,7 +32,7 @@ extern "C" void main() {
     GPIOHandle input(21);
         
     input.SetInput();
-        
+
     for(int i = 0; i < 4; i++) {
         blinker[i].SetOutput();
     }

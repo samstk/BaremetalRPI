@@ -710,4 +710,10 @@ static const char _systemFontBuffer[] = {
   0xbc, 0xff, 0xc3, 0xbd, 0xff, 0xc3, 0xbe, 0xff, 0xc3, 0xbf, 0xff
 };
 static PSF2Font _systemFont = PSF2Font();
+
+/// @brief Sets the default system font
+void setSystemFont(PSF2Font systemFont);
+
+/// @brief Gets the default system font
+PSF2Font getSystemFont();
 #endif

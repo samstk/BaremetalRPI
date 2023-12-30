@@ -10,6 +10,9 @@ struct Framebuffer {
         /// @brief The resolution of the framebuffer as initialized.
         Size resolution;
 
+        /// @brief Creates an uninitialized framebuffer reference.
+        Framebuffer();
+
         /// @brief Initialises the RPI3A+ framebuffer with the given resolution
         /// @param width The width of the framebuffer
         /// @param height The height of the framebuffer
