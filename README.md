@@ -9,6 +9,9 @@ a look at.
 
 Also credits to PeterLemon for his assembly tutorials which also helped enormously: https://github.com/PeterLemon/RaspberryPi/blob/master
 
+The OsDEV wiki also contains helpful resources that I have looked at and used (such as the stacktracing)
+https://wiki.osdev.org/
+
 ## Why C++ and not C
 Previously I have programmed a bare metal RPI image using C, however
 have decided to go with C++ due to a few reasons (mainly preference):
@@ -37,12 +40,16 @@ framebuffer_swap=0
 
 If any problems occur, then it may be an issue with the hardware or power supply.
 
+## Completed Feataures
+* Basic GPIO Management (Output)
+* Basic GPIO Management (Input)
+* Writing to Physical Display - Graphics Management
+* Writing PSF2 Fonts to Physical Display - Graphics Management
+* System Timer Counter reading
+* Stacktracking and crash() function to dump stack trace. 
+
 ## Milestones
 Current outlook of objectives (may be subject to change)
-* Basic GPIO Management (Output) - Completed (Bug may exist)
-* Basic GPIO Management (Input) - Completed
-* Writing to Physical Display - Graphics Management (Complete)
-* Writing fonts to Physical Display - Graphics Management (Complete - ASCII PSF2 only)
-* System Timer Counter - Completed
+* Reading Joystick Values
 * Generating Interrupt via Timer.
 * Creating Task System - OS Programming
