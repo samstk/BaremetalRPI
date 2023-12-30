@@ -4,6 +4,8 @@
 #include <resources/systemfont.hpp>
 #include <hardware/mailbox.hpp>
 #include <data/time.hpp>
+#include <system.hpp>
+
 
 /// @brief The main function for the first core
 extern "C" void main() {
@@ -13,15 +15,19 @@ extern "C" void main() {
     // Initialise the framebuffer for screen drawing
     Framebuffer framebuffer = Framebuffer(640, 480);
     setSystemFramebuffer(framebuffer); // For error messages
+
+    // Creates a graphics object for the framebuffer.
+    Graphics gfx = Graphics(framebuffer);
+    gfx.Fill(Color(82, 32, 32));
+
     
+
     // Initialise the system font
     _systemFont = PSF2Font((char*) _systemFontBuffer);
     setSystemFont(_systemFont);
 
-    // Creates a graphics object for the framebuffer.
-    Graphics gfx = Graphics(framebuffer);
-
-    gfx.Fill(Color(32, 32, 32));
+    
+    
 
     GPIOHandle blinker[4];
     blinker[0] = GPIOHandle(22);
@@ -36,6 +42,8 @@ extern "C" void main() {
     for(int i = 0; i < 4; i++) {
         blinker[i].SetOutput();
     }
+
+    
 
     while(true) {
         assert(input.IsActive() == false, "Do not press the button");
@@ -99,20 +107,24 @@ extern "C" void main() {
             );
 
         timeToWait.SpinWait();
+
     }
 }
 
 /// @brief The main function for the second core
 extern "C" void main_core_2() {
+
     while(1);
 }
 
 /// @brief The main function for the third core
 extern "C" void main_core_3() {
+
     while(1);
 }
 
 /// @brief The main function for the fourth core
 extern "C" void main_core_4() {
+
     while(1);
 }

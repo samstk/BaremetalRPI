@@ -40,7 +40,6 @@
 
 .global _start
 
-_stack:
 _start:
     // read cpu id, stop slave cores
     mrs     x1, mpidr_el1
@@ -49,24 +48,53 @@ _start:
 
     // Modified to redirect cores to their own main functions.
     cmp     x1, 1
-    b.eq    main_core_2
+    b.eq    _run_core_2
 
     cmp     x1, 2
-    b.eq    main_core_3
+    b.eq    _run_core_3
     
     cmp     x1, 3
-    b.eq    main_core_4
+    b.eq    _run_core_4
 
     // cpu id > 0, stop
 1:  wfe
     b       1b
 2:  // cpu id == 0
-
-    // set top of stack just before our code (stack grows to a lower address per AAPCS64)
-    ldr     x1, =_stack
-    mov     sp, x1
-
     // jump to C code, should not return
+    mov x1, 0x1B000000
+    mov x2, 0xFF0000
+    add x1, x1, x2
+    mov sp, x1
 4:  bl      main
     // for failsafe, halt this core too
     b       1b
+
+_run_core_2:  
+    mov x1, 0x1B000000
+    mov x2, 0xFF0000
+    add x1, x1, x2
+    mov x2, 0x10000
+    sub x1, x1, x2
+    mov sp, x1
+    bl main_core_2
+    b 1b
+
+_run_core_3:  
+    mov x1, 0x1B000000
+    mov x2, 0xFF0000
+    add x1, x1, x2
+    mov x2, 0x20000
+    sub x1, x1, x2
+    mov sp, x1
+    bl main_core_3
+    b 1b
+
+_run_core_4:  
+    mov x1, 0x1B000000
+    mov x2, 0xFF0000
+    add x1, x1, x2
+    mov x2, 0x30000
+    sub x1, x1, x2
+    mov sp, x1
+    bl main_core_4
+    b 1b

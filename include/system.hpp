@@ -46,9 +46,15 @@ int getCoreId();
 /// @brief Gets the system board information
 RPIMachineInfo getSystemInfo();
 
+static Framebuffer _systemFramebuffer;
+
 /// @brief Sets the system's framebuffer that is written to when crashed
 /// @param buffer The buffer that is written to when crashed.
 void setSystemFramebuffer(Framebuffer buffer);
+
+/// @brief Gets the system framebuffer as set in setSystemFramebuffer
+/// @return The system framebuffer
+Framebuffer getSystemFramebuffer();
 
 /// @brief A label of a function in program memory
 struct FunctionLabel {

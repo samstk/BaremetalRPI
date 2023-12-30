@@ -6,7 +6,9 @@ SystemTimer* SystemTimer::GetSystemTimer() {
 }
 
 unsigned int SystemTimer::GetSystemTimerFrequency() {
-    return SYSTEMTIMER_FREQ;
+    register unsigned long freq;
+    asm volatile("mrs %0, cntfrq_el0" : "=r"(freq));
+    return freq;
 }
 
 unsigned long SystemTimer::GetSystemTime() {

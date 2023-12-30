@@ -46,7 +46,7 @@ If any problems occur, then it may be an issue with the hardware or power supply
 * Writing to Physical Display - Graphics Management
 * Writing PSF2 Fonts to Physical Display - Graphics Management
 * System Timer Counter reading
-* Stacktracking and crash() function to dump stack trace. 
+* Stacktracking and crash() function to dump stack trace (QEMU only)
 
 ## Milestones
 Current outlook of objectives (may be subject to change)

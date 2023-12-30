@@ -20,8 +20,10 @@ struct MemoryAllocationMetadata {
 
 #pragma region struct RPIBoard
 RPIMachineInfo::RPIMachineInfo() {
-    this->memoryRAM = 0x20000000; // 512 megabytes (temporary value)
     this->memoryStart = (char*) &_end;
+    // 512 megabytes (temporary value) - stack
+    this->memoryRAM = 0x1C000000 - 0x400000 - (unsigned long)this->memoryStart;
+    
     this->memoryEnd = this->memoryStart + this->memoryRAM;
     this->memoryTarget = this->memoryStart;
 
@@ -202,8 +204,6 @@ extern "C" void free(void* alloc) {
 
     metadata->allocated = false;
 }
-
-static Framebuffer _systemFramebuffer;
 
 void setSystemFramebuffer(Framebuffer buffer) {
     _systemFramebuffer = buffer;
