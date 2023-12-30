@@ -35,6 +35,8 @@ disable_overscan=1
 framebuffer_swap=0
 ```
 
+If any problems occur, then it may be an issue with the hardware or power supply.
+
 ## Milestones
 Current outlook of objectives (may be subject to change)
 * Basic GPIO Management (Output) - Completed (Bug may exist)
