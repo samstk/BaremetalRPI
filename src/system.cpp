@@ -125,6 +125,16 @@ FunctionLabel::FunctionLabel(unsigned int programAddress) {
 }
 #pragma endregion
 
+/// @brief Crashes the system if the asserted value is not true.
+void assert(bool asserted, const char* label) {
+    if (!asserted) {
+        if (label) {
+            crash(String("Assertion failed -- ") + String(label));
+        } else {
+            crash("Assertion failed");
+        }
+    }
+}
 
 #define MALLOC_METADATASIZE sizeof(MemoryAllocationMetadata)
 

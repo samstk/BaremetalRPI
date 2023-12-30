@@ -37,8 +37,9 @@ extern "C" void main() {
         blinker[i].SetOutput();
     }
 
-    
     while(true) {
+        assert(input.IsActive() == false, "Do not press the button");
+        
         TimeSpan currentTime = TimeSpan::GetCurrentTime();
 
         bool isActive = input.IsActive();

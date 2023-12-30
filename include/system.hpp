@@ -33,6 +33,9 @@ class Stacktrace {
         Stacktrace();
 };
 
+/// @brief Crashes the system if the asserted value is not true.
+void assert(bool asserted, const char* label = NULL);
+
 /// @brief Initialises the system board information
 void initSystemInfo();
 
