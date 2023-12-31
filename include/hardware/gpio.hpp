@@ -1,19 +1,19 @@
-#include <system.hpp>
 #ifndef _H_GPIO
 #define _H_GPIO
-
-#define GPFSEL0         ((unsigned int*)(PERIPHERAL_BASE+0x00200000))
-#define GPFSEL1         ((unsigned int*)(PERIPHERAL_BASE+0x00200004))
-#define GPFSEL2         ((unsigned int*)(PERIPHERAL_BASE+0x00200008))
-#define GPFSEL3         ((unsigned int*)(PERIPHERAL_BASE+0x0020000C))
-#define GPFSEL4         ((unsigned int*)(PERIPHERAL_BASE+0x00200010))
-#define GPFSEL5         ((unsigned int*)(PERIPHERAL_BASE+0x00200014))
-#define GPSET0          ((unsigned int*)(PERIPHERAL_BASE+0x0020001C))
-#define GPSET1          ((unsigned int*)(PERIPHERAL_BASE+0x00200020))
-#define GPCLR0          ((unsigned int*)(PERIPHERAL_BASE+0x00200028))
-#define GPCLR1          ((unsigned int*)(PERIPHERAL_BASE+0x0020002C))
-#define GPLEV0          ((unsigned int*)(PERIPHERAL_BASE+0x00200034))
-#define GPLEV1          ((unsigned int*)(PERIPHERAL_BASE+0x00200038))
+#include <commons.hpp>
+#include <system.hpp>
+#define GPFSEL0         ((uint*)(PERIPHERAL_BASE+0x00200000))
+#define GPFSEL1         ((uint*)(PERIPHERAL_BASE+0x00200004))
+#define GPFSEL2         ((uint*)(PERIPHERAL_BASE+0x00200008))
+#define GPFSEL3         ((uint*)(PERIPHERAL_BASE+0x0020000C))
+#define GPFSEL4         ((uint*)(PERIPHERAL_BASE+0x00200010))
+#define GPFSEL5         ((uint*)(PERIPHERAL_BASE+0x00200014))
+#define GPSET0          ((uint*)(PERIPHERAL_BASE+0x0020001C))
+#define GPSET1          ((uint*)(PERIPHERAL_BASE+0x00200020))
+#define GPCLR0          ((uint*)(PERIPHERAL_BASE+0x00200028))
+#define GPCLR1          ((uint*)(PERIPHERAL_BASE+0x0020002C))
+#define GPLEV0          ((uint*)(PERIPHERAL_BASE+0x00200034))
+#define GPLEV1          ((uint*)(PERIPHERAL_BASE+0x00200038))
 
 /// @brief A handle for a GPIO Pin on the Board
 ///        which contains information and functions relevant
@@ -25,24 +25,24 @@ struct GPIOHandle {
 
     private:
         /// @brief The function select address used for this pin
-        unsigned int* functionSelectAddress;
+        uint* functionSelectAddress;
 
         /// @brief The output set address used for this pin
-        unsigned int* outputSetAddress;
+        uint* outputSetAddress;
 
         /// @brief The output clear address used for this pin
-        unsigned int* outputClearAddress;
+        uint* outputClearAddress;
 
         /// @brief The level address used for this pin
-        unsigned int* inputLevelAddress;
+        uint* inputLevelAddress;
 
         /// @brief The offset in the general registers
         ///        that refers to the pin (bit position)
-        unsigned int bitMask;
+        uint bitMask;
 
         /// @brief The offset in the function select register
         ///        that refers to this pin
-        unsigned int functionOffset;
+        uint functionOffset;
         
     public:
         /// @brief Creates an uninitialized handle for a GPIO pin.

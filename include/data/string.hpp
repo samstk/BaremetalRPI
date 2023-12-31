@@ -1,6 +1,6 @@
 #ifndef _H_STRING
 #define _H_STRING
-
+#include <commons.hpp>
 /// @brief Values that determine how a particular value is read as a string
 enum StringConversionFormat {
     /// @brief The value is converted in 1's and 0's (e.g. 10001100)
@@ -82,10 +82,10 @@ struct String {
         /// @return The new string with the sub section
         String Substring(int fromIndex, int length);
 
-        /// @brief Converts all leading digits to a unsigned long value
+        /// @brief Converts all leading digits to a ulong value
         /// @param format The format of the digits
-        /// @return The unsigned long value held in the string
-        unsigned long ToUInt64(StringConversionFormat format = StringConversionFormat::ORIGINAL);
+        /// @return The ulong value held in the string
+        ulong ToUInt64(StringConversionFormat format = StringConversionFormat::ORIGINAL);
 
         /// @brief Converts an integer to a string value.
         /// @param value The value to convert
@@ -106,7 +106,7 @@ struct String {
         /// @param value The value to convert
         /// @param format The format to convert to
         /// @return The converted string
-        static String ParseInt(unsigned int value, 
+        static String ParseInt(uint value, 
             StringConversionFormat format = StringConversionFormat::ORIGINAL);
         
         /// @brief Converts an integer to a string value.
@@ -114,7 +114,7 @@ struct String {
         /// @param format The format to convert to
         /// @param bits The number of bits storing the value
         /// @return The converted string
-        static String ParseLong(unsigned long value, 
+        static String ParseLong(ulong value, 
             StringConversionFormat format = StringConversionFormat::ORIGINAL, int bits=64);
 };
 

@@ -35,7 +35,6 @@
  * DEALINGS IN THE SOFTWARE.
  *
  */
-
 .section ".text.boot"
 
 .global _start

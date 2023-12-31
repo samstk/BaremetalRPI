@@ -2,12 +2,13 @@
 #define _H_GFX
 #include <gfx/font.hpp>
 #include <data/string.hpp>
+#include <commons.hpp>
 struct Framebuffer;
 
 struct Color {
     public:
         /// @brief The 32-bit integer representing this color
-        unsigned int data;
+        uint data;
 
         /// @brief Initializes a new color with the given components
         /// @param r The red component of the color
@@ -117,21 +118,38 @@ struct Rectangle {
 struct Graphics {
     public: 
         /// @brief The address of the buffer
-        unsigned int *buffer;
-        
+        uint *buffer;
+
         /// @brief The width of the region the buffer contains
         int bufferWidth;
 
         /// @brief The height of the region the buffer contains
         int bufferHeight;
 
+        /// @brief The address of the back buffer
+        uint *backBuffer;
+
         /// @brief Creates a graphics handle for the framebuffer 
         /// @param framebuffer The framebuffer to draw on
-        Graphics(Framebuffer framebuffer);
+        /// @param doubleBuffering If true then an equal size buffer is allocated
+        ///                        and is written to. Use Flush to flush data to
+        ///                        the main buffer.
+        Graphics(Framebuffer framebuffer, bool doubleBuffering=false);
+
+        /// @brief Gets the buffer that is directly rendered to
+        /// @return The rendered buffer address
+        uint *GetRenderBuffer();
 
         /// @brief Calculates the total size of the buffer
-        /// @return The size of the buffer
+        /// @return The size of the buffer in bytes
         int GetBufferSize();
+
+        /// @brief Calculates the total area of the buffer
+        /// @return The size of the buffer in pixels (32-bit)
+        int GetBufferArea();
+
+        /// @brief Flushes the backbuffer data to the main buffer
+        void Flush();
 
         /// @brief Fills the buffer with the given colour
         /// @param color The color to fill with

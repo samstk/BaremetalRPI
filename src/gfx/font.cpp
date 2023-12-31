@@ -1,7 +1,7 @@
 #include <gfx/font.hpp>
 #include <gfx/psf2.hpp>
 #include <system.hpp>
-
+#include <commons.hpp>
 #pragma region Font
 PSF2Font::PSF2Font(char* buffer) {
     PSF2Header* header = (PSF2Header*) buffer;

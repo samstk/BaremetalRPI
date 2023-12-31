@@ -1,13 +1,13 @@
 #include <data/time.hpp>
 #include <hardware/systemtimer.hpp>
-
+#include <commons.hpp>
 #pragma region TimeSpan
-TimeSpan::TimeSpan(unsigned long ticks) {
+TimeSpan::TimeSpan(ulong ticks) {
     this->ticks = ticks;
 }
 
-TimeSpan::TimeSpan(unsigned long amount, TimeUnit unit) {
-    unsigned int timerFrequency = SystemTimer::GetSystemTimerFrequency();
+TimeSpan::TimeSpan(ulong amount, TimeUnit unit) {
+    uint timerFrequency = SystemTimer::GetSystemTimerFrequency();
     // Ticks per nanoseconds = timerFrequency per second / 1000000
     switch(unit) {
         case TimeUnit::NANOSECOND:
@@ -25,13 +25,37 @@ TimeSpan::TimeSpan(unsigned long amount, TimeUnit unit) {
     }
 }
 
+TimeSpan TimeSpan::AddNanoseconds(ulong amount) {
+    return TimeSpan(this->ticks + TimeSpan(amount, ::NANOSECOND).ticks);
+}
+
+TimeSpan TimeSpan::AddMilliseconds(ulong amount) {
+    return TimeSpan(this->ticks + TimeSpan(amount, ::MILLISECOND).ticks);
+}
+
+TimeSpan TimeSpan::AddSeconds(ulong amount) {
+    return TimeSpan(this->ticks + TimeSpan(amount, ::SECOND).ticks);
+}
+
+TimeSpan TimeSpan::AddMinutes(ulong amount) {
+    return this->AddSeconds(amount * 60);
+}
+
+TimeSpan TimeSpan::AddHours(ulong amount) {
+    return this->AddMinutes(amount * 60);
+}
+
+TimeSpan TimeSpan::AddDays(ulong amount) {
+    return this->AddHours(amount * 24);
+}
+
 TimeSpan TimeSpan::GetCurrentTime() {
     return TimeSpan(SystemTimer::GetSystemTime());
 }
 
 void TimeSpan::SpinWait() {
-    unsigned long currentTime = SystemTimer::GetSystemTime();
-    unsigned long targetTime = currentTime + this->ticks;
+    ulong currentTime = SystemTimer::GetSystemTime();
+    ulong targetTime = currentTime + this->ticks;
     while (currentTime < targetTime) {
         currentTime = SystemTimer::GetSystemTime();
     }

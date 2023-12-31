@@ -1,5 +1,5 @@
 #include <hardware/gpio.hpp>
-
+#include <commons.hpp>
 #pragma region struct GPIOHandle
 #define GPFCLEARMASK 0b111
 #define GPFOUTPUTMASK 0b001
@@ -60,7 +60,7 @@ void GPIOHandle::SetInput() {
 }
 
 void GPIOHandle::SetOutput() {
-    unsigned int currentFunction = *this->functionSelectAddress;
+    uint currentFunction = *this->functionSelectAddress;
     currentFunction &= ~(GPFCLEARMASK << this->functionOffset);
     currentFunction |= GPFOUTPUTMASK << this->functionOffset;
     *this->functionSelectAddress = currentFunction;

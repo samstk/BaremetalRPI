@@ -1,6 +1,6 @@
 #ifndef _H_SYSTEM
 #define _H_SYSTEM
-#define NULL 0
+#include <commons.hpp>
 #define PERIPHERAL_BASE       0x3F000000
 #define SYSTEM_STACKTRACE_MAXSTEPS 6
 #include <hardware/framebuffer.hpp>
@@ -15,9 +15,6 @@ struct RPIMachineInfo {
 
         /// @brief The end address for freely available memory
         char* memoryEnd;
-        
-        /// @brief The next address for allocated memory.
-        char* memoryTarget;
 
         /// @brief Initialises the information of the board
         RPIMachineInfo();
@@ -27,7 +24,7 @@ struct RPIMachineInfo {
 class Stacktrace {
     public:
         /// @brief The current address of this step.
-        unsigned int stack[6];
+        uint stack[6];
 
         /// @brief Creates a new stack trace
         Stacktrace();
@@ -60,7 +57,7 @@ Framebuffer getSystemFramebuffer();
 struct FunctionLabel {
     public:
         /// @brief The address of the function
-        unsigned int address;
+        uint address;
 
         /// @brief The name of the function
         String name;
@@ -70,7 +67,7 @@ struct FunctionLabel {
 
         /// @brief Constructs a new function label approximately from the address given 
         /// @param programAddress The address of a line within the function.
-        FunctionLabel(unsigned int programAddress);
+        FunctionLabel(uint programAddress);
 
 
 };
@@ -96,12 +93,12 @@ void crash(String errorMessage);
 
 
 /// @brief Swaps the endianness of an 32-bit value
-unsigned int magic(unsigned int value);
+uint magic(uint value);
 
 /// @brief Copies a number of bytes from src to dest
 /// @param dest The destination of the bytes
 /// @param src The source of the bytes (to copy from)
 /// @param count The number of bytes
-extern "C" void memcpy(void* dest, const void* src, unsigned long count);
+extern "C" void memcpy(void* dest, const void* src, ulong count);
 
 #endif

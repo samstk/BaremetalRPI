@@ -5,10 +5,14 @@
 #include <hardware/mailbox.hpp>
 #include <data/time.hpp>
 #include <system.hpp>
-
+#include <commons.hpp>
+#include <hardware/dma.hpp>
 
 /// @brief The main function for the first core
 extern "C" void main() {
+    // Initialise the DMA engine
+    DMAManager::Init();
+    
     // Initialise the board information
     initSystemInfo();
 
@@ -16,19 +20,14 @@ extern "C" void main() {
     Framebuffer framebuffer = Framebuffer(640, 480);
     setSystemFramebuffer(framebuffer); // For error messages
 
-    // Creates a graphics object for the framebuffer.
-    Graphics gfx = Graphics(framebuffer);
-    gfx.Fill(Color(82, 32, 32));
-
-    
-
     // Initialise the system font
     _systemFont = PSF2Font((char*) _systemFontBuffer);
     setSystemFont(_systemFont);
 
+    // Creates a graphics object for the framebuffer.
+    Graphics gfx = Graphics(framebuffer, false);
+    gfx.Fill(Color(22, 22, 22));
     
-    
-
     GPIOHandle blinker[4];
     blinker[0] = GPIOHandle(22);
     blinker[1] = GPIOHandle(23);
@@ -41,9 +40,7 @@ extern "C" void main() {
 
     for(int i = 0; i < 4; i++) {
         blinker[i].SetOutput();
-    }
-
-    
+    }   
 
     while(true) {
         assert(input.IsActive() == false, "Do not press the button");
@@ -55,13 +52,13 @@ extern "C" void main() {
             blinker[i].Write(isActive);
         }
 
-        gfx.FillRectangle(Rectangle(16, 16, 16*48, 80), Color(32, 32, 32));
-
+        gfx.FillRectangle(Rectangle(16, 16, 16*36, 80), Color(32, 32, 32));
+        
         String timeString = 
             String::ParseLong(currentTime.ticks, StringConversionFormat::ORIGINAL);
 
         String memoryString = String::ParseLong(
-            (unsigned long)timeString.data, StringConversionFormat::HEX
+            (ulong)timeString.data, StringConversionFormat::HEX
         );
 
         gfx.DrawString(
@@ -70,7 +67,7 @@ extern "C" void main() {
             String("Time: ") + timeString,
             Color(255,255,255)
             );
-
+        
         gfx.DrawString(
             &_systemFont, 
             Point(16, 36), 
@@ -94,6 +91,8 @@ extern "C" void main() {
                 );
         }
 
+               
+
         TimeSpan timeToWait = TimeSpan(250, TimeUnit::MILLISECOND);
 
         timeString = 
@@ -106,6 +105,7 @@ extern "C" void main() {
             Color(255,255,255)
             );
 
+        gfx.Flush();
         timeToWait.SpinWait();
 
     }

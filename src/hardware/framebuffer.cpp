@@ -1,6 +1,6 @@
 #include <hardware/framebuffer.hpp>
 #include <hardware/mailbox.hpp>
-
+#include <commons.hpp>
 #pragma region struct Framebuffer
 #define PROP_PHYSICAL_DISPLAY   0x00048003
 #define PROP_VIRTUAL_BUFFER     0x00048004
@@ -24,9 +24,9 @@ Framebuffer::Framebuffer(int width, int height) {
     
     // Add general configuration
     mailbox.AddRequestProperty(PROP_PHYSICAL_DISPLAY,
-        (unsigned int)width, (unsigned int)height);
+        (uint)width, (uint)height);
     mailbox.AddRequestProperty(PROP_VIRTUAL_BUFFER, 
-        (unsigned int)width, (unsigned int)height);
+        (uint)width, (uint)height);
 
     mailbox.AddRequestProperty(PROP_DEPTH, 32);
     mailbox.AddRequestProperty(PROP_VIRTUAL_OFFSET, 0, 0);
@@ -34,7 +34,7 @@ Framebuffer::Framebuffer(int width, int height) {
         0, 2, 0x00000000, 0xFFFFFFFF);
     
     // Add response buffer address (64-bit)
-    unsigned int *buffer_pointer = (unsigned int *)mailbox.AddRequestProperty(
+    uint *buffer_pointer = (uint *)mailbox.AddRequestProperty(
         PROP_ALLOCATE_BUFFER, 0, 0
     );
 
@@ -43,10 +43,10 @@ Framebuffer::Framebuffer(int width, int height) {
     while (true) {
         mailbox.Write();
         
-        unsigned int fbPointer = *buffer_pointer;
+        uint fbPointer = *buffer_pointer;
         if (fbPointer != 0) {
             // Take conversion from BUS address to physical address
-            this->buffer = (unsigned int *)((unsigned long)(fbPointer & 0x3FFFFFFF));
+            this->buffer = (uint *)((ulong)(fbPointer & 0x3FFFFFFF));
             return;
         }
     }

@@ -45,11 +45,14 @@ If any problems occur, then it may be an issue with the hardware or power supply
 * Basic GPIO Management (Input)
 * Writing to Physical Display - Graphics Management
 * Writing PSF2 Fonts to Physical Display - Graphics Management
-* System Timer Counter reading
+* System Timer Counter reading - although measurements of time (e.g. seconds ) are not accurate
 * Stacktracking and crash() function to dump stack trace (QEMU only)
+* DMA & Graphics Doublebuffering (QEMU works but hardware crashing)
+  - disabled for now
 
 ## Milestones
 Current outlook of objectives (may be subject to change)
+
 * Reading Joystick Values
 * Generating Interrupt via Timer.
 * Creating Task System - OS Programming

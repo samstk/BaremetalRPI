@@ -1,6 +1,7 @@
 #include <gfx/gfx.hpp>
 #include <data/string.hpp>
-
+#include <system.hpp>
+#include <commons.hpp>
 #pragma region struct Point & Size
 Point::Point() {
     this->x = 0;
@@ -42,16 +43,16 @@ Rectangle::Rectangle(int x, int y, int width, int height) {
 #pragma region struct Color
 Color::Color(char r, char g, char b) {
     this->data = 
-        ((unsigned int)r) |
-        ((unsigned int)g << 8) | 
-        ((unsigned int)b << 16);
+        ((uint)r) |
+        ((uint)g << 8) | 
+        ((uint)b << 16);
 }
 
 Color::Color(char r, char g, char b, char a) {
-    this->data = ((unsigned int)a << 24) |
-        ((unsigned int)r) |
-        ((unsigned int)g << 8) | 
-        ((unsigned int)b << 16);
+    this->data = ((uint)a << 24) |
+        ((uint)r) |
+        ((uint)g << 8) | 
+        ((uint)b << 16);
 }
 
 char Color::getR() {
@@ -59,7 +60,7 @@ char Color::getR() {
 }
 void Color::setR(char r) {
     this->data &= 0xFFFF00FF;
-    this->data |= (unsigned int)r << 8;
+    this->data |= (uint)r << 8;
 }
 
 char Color::getG() {
@@ -67,7 +68,7 @@ char Color::getG() {
 }
 void Color::setG(char g) {
     this->data &= 0xFF00FFFF;
-    this->data |= (unsigned int)g << 16;
+    this->data |= (uint)g << 16;
 }
 
 char Color::getB() {
@@ -75,7 +76,7 @@ char Color::getB() {
 }
 void Color::setB(char r) {
     this->data &= 0x00FFFFFF;
-    this->data |= (unsigned int)r << 24;
+    this->data |= (uint)r << 24;
 }
 
 char Color::getA() {
@@ -83,34 +84,59 @@ char Color::getA() {
 }
 void Color::setA(char a) {
     this->data &= 0xFFFFFF00;
-    this->data |= (unsigned int)a;
+    this->data |= (uint)a;
 }
 
 #pragma endregion
 
 #pragma region struct Graphics
-Graphics::Graphics(Framebuffer framebuffer) {
+Graphics::Graphics(Framebuffer framebuffer, bool doubleBuffering) {
     this->buffer = framebuffer.buffer;
     this->bufferWidth = framebuffer.resolution.width;
     this->bufferHeight = framebuffer.resolution.height;
+
+    if (doubleBuffering) {
+        this->backBuffer = (uint *) malloc(this->GetBufferSize());
+    } else {
+        this->backBuffer = NULL;
+    }
+}
+
+void Graphics::Flush() {
+    if (this->backBuffer) {
+        memcpy(this->buffer, this->backBuffer, this->GetBufferSize());
+    }
+}
+
+uint* Graphics::GetRenderBuffer() {
+    if (this->backBuffer) {
+        return this->backBuffer;
+    } else {
+        return this->buffer;
+    }
 }
 
 int Graphics::GetBufferSize() {
-    return this->bufferWidth * this->bufferHeight * 4;
+    return this->GetBufferArea() * 4;
+}
+
+int Graphics::GetBufferArea() {
+    return this->bufferWidth * this->bufferHeight;
 }
 
 void Graphics::Fill(Color color) {
-    unsigned int *buffer = this->buffer;
-    int size = this->GetBufferSize();
+    uint *buffer = this->GetRenderBuffer();
+    int size = this->GetBufferArea();
 
-    while(size-- > 0) {
+    while(size > 0) {
         *buffer = color.data;
         buffer++;
+        size--;
     }
 }
 
 void Graphics::FillRectangle(Rectangle region, Color color) {
-    unsigned int *buffer = this->buffer;
+    uint *buffer = this->GetRenderBuffer();
 
     int w = region.width;
     int h = region.height;
@@ -130,15 +156,15 @@ void Graphics::FillRectangle(Rectangle region, Color color) {
 }
 
 void Graphics::DrawChar(PSF2Font* font, Point location, char c, Color color) {
-    unsigned int *buffer = this->buffer + (location.y * this->bufferWidth + location.x);
+    uint *buffer = this->GetRenderBuffer() + (location.y * this->bufferWidth + location.x);
     
     char* glyph = font->GetGlyph(c);
         
     char glyphRow = *glyph; 
     int skip = 8;
 
-    for(unsigned int y = 0; y < font->header->characterHeight; y++) {
-        for(unsigned int x = 0; x < font->header->characterWidth; x++) {
+    for(uint y = 0; y < font->header->characterHeight; y++) {
+        for(uint x = 0; x < font->header->characterWidth; x++) {
             if (skip == 0) {
                 // Must swap to next glyph byte
                 glyph++;

@@ -1,11 +1,11 @@
 #ifndef _H_FRAMEBUFFER
 #define _H_FRAMEBUFFER
 #include <gfx/gfx.hpp>
-
+#include <commons.hpp>
 struct Framebuffer {
     public:
         /// @brief The physical address to the framebuffer
-        unsigned int* buffer;
+        uint* buffer;
 
         /// @brief The resolution of the framebuffer as initialized.
         Size resolution;

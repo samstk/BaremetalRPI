@@ -1,14 +1,15 @@
 #ifndef _H_PSF2
 #define _H_PSF2
+#include <commons.hpp>
 struct PSF2Header {
     public:
-        unsigned int magic;
-        unsigned int version;
-        unsigned int headerSize;
-        unsigned int flags;
-        unsigned int length;
-        unsigned int glyphSize;
-        unsigned int characterHeight;
-        unsigned int characterWidth;        
+        uint magic;
+        uint version;
+        uint headerSize;
+        uint flags;
+        uint length;
+        uint glyphSize;
+        uint characterHeight;
+        uint characterWidth;        
 };
 #endif

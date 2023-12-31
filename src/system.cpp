@@ -6,39 +6,41 @@
 #include <gfx/font.hpp>
 #include <resources/systemfont.hpp>
 #include <resources/funcmap.hpp>
+#include <commons.hpp>
+#include <hardware/dma.hpp>
 
 /// @brief Metadata for memory allocation
 struct MemoryAllocationMetadata {
     public:
         /// @brief The size of the allocation
         int size;
+
         /// @brief True if the metadata represents allocated memory 
         int allocated;
-        /// @brief True if the next allocation metadata has already been accessed.
-        int nextAllocationAccessed;
+        
+        /// @brief The address of the previous metadata (NULL if none)
+        uint previous;
+
+        /// @brief The address of the next metadata (NULL if none)
+        uint next;
 };
+
+#define USE_DMA_FOR_MEMCPY true
+#define MALLOC_METADATASIZE sizeof(MemoryAllocationMetadata)
 
 #pragma region struct RPIBoard
 RPIMachineInfo::RPIMachineInfo() {
     this->memoryStart = (char*) &_end;
-    // 512 megabytes (temporary value) - stack
-    this->memoryRAM = 0x1C000000 - 0x400000 - (unsigned long)this->memoryStart;
-    
+    this->memoryRAM = 0x1C000000 - 0x400000 - (ulong)this->memoryStart
+        - MALLOC_METADATASIZE;
     this->memoryEnd = this->memoryStart + this->memoryRAM;
-    this->memoryTarget = this->memoryStart;
-
-    MemoryAllocationMetadata* startMetadata = 
-        (MemoryAllocationMetadata*)this->memoryStart;
-    startMetadata->size = this->memoryRAM;
-    startMetadata->allocated = false;
-    startMetadata->nextAllocationAccessed = false;
 }
 #pragma endregion
 
 #pragma region class Stacktrace
 struct Stackframe {
     Stackframe* ebp;
-    unsigned int eip;
+    uint eip;
 };
 
 Stacktrace::Stacktrace() {
@@ -62,9 +64,20 @@ Stacktrace::Stacktrace() {
 #pragma endregion
 
 static RPIMachineInfo _systemInfo;
+static int allocations = 0;
+
+/// @brief The next allocation to be considered in malloc
+static MemoryAllocationMetadata* nextAllocation;
 
 void initSystemInfo() {
     _systemInfo = RPIMachineInfo();
+    allocations = 0;
+
+    nextAllocation = (MemoryAllocationMetadata*) _systemInfo.memoryStart;
+    nextAllocation->previous = NULL;
+    nextAllocation->next = NULL;
+    nextAllocation->allocated = false;
+    nextAllocation->size = _systemInfo.memoryRAM;
 }
 
 RPIMachineInfo getSystemInfo() {
@@ -83,7 +96,7 @@ FunctionLabel::FunctionLabel() {
     this->address = NULL;
 }
 
-FunctionLabel::FunctionLabel(unsigned int programAddress) {
+FunctionLabel::FunctionLabel(uint programAddress) {
     char* funcmap = getFunctionMap();
 
     // All definitions are in the form of:
@@ -92,12 +105,12 @@ FunctionLabel::FunctionLabel(unsigned int programAddress) {
     // Continue to check until there are no longer any valid pointers.
 
     char* prevLabel = funcmap;
-    unsigned long prevAddress = String(funcmap, 16).ToUInt64(StringConversionFormat::HEX);
+    ulong prevAddress = String(funcmap, 16).ToUInt64(StringConversionFormat::HEX);
     
     while (*funcmap == '0') {
         String location = String(funcmap, 16);
         
-        unsigned long address = location.ToUInt64(StringConversionFormat::HEX);
+        ulong address = location.ToUInt64(StringConversionFormat::HEX);
         
         if (programAddress <= address) {
             this->address = prevAddress;
@@ -138,60 +151,82 @@ void assert(bool asserted, const char* label) {
     }
 }
 
-#define MALLOC_METADATASIZE sizeof(MemoryAllocationMetadata)
-
 extern "C" void* malloc(int size) {
-    // Simple implementation of malloc (slow but simple, temporary solution only)
+    // Simple implementation of malloc
     //
     // Explanation:
-    // M = Metadata about the allocation.
-    // D = data that can be written and is returned from malloc.
-    // Structure: [M][DDDD][M][DDDD]
+    // [M->][DDDD][<-M->][DDDD][<-M->][DDDD]
     //
-    // When the memory is first initialised the structure is just below:
-    // [M size=1000]
-    //
-    // Every-time malloc is called it searches for the first available allocation.
-    // [M] <- is free
-    // [M size=4][DDDD][M size=996 (new metadata)]
+    // A pointer to the end of the list is kept statically,
+    // and is considered first. If the allocation is not suitable,
+    // then it will search around the list for a suitable allocation.
+    // (one that is not allocated and is at least the size wanted)
     // 
-    // Say the first element is freed
-    // [M size=4 free][DDDD][M size=996]
-    //
-    // Then the next allocation (of size 4 or below) will go to the first element.
+    // An error occurs if the maximum amount of memory has been reached,
+    // and all allocations have been checked for free memory.
 
     // Round size up (align 4) so that everything is aligned to 32-bits.
     size = ((size + 3) / 4) * 4;
-
+    
     RPIMachineInfo systemInfo = getSystemInfo();
-
+    allocations++;
+    
     // Find the next available allocation
-    MemoryAllocationMetadata* metadata = (MemoryAllocationMetadata*) systemInfo.memoryStart;
+    MemoryAllocationMetadata* metadata = nextAllocation;
 
-    while(metadata->allocated || metadata->size < size) {
-        metadata = (MemoryAllocationMetadata*) 
-            ((char*) metadata + MALLOC_METADATASIZE + metadata->size);
+    while (metadata->allocated || metadata->size < size) {
+        // Move to the next metadata in the list
+        if (metadata->next == NULL) {
+            // Must be at the end of the list so restart
+            metadata = (MemoryAllocationMetadata*) systemInfo.memoryStart;
+        }
+        else {
+            metadata = (MemoryAllocationMetadata*) (ulong) metadata->next;
+        }
 
-        if ((void*) metadata >= systemInfo.memoryEnd) {
-            crash("Ran out of Memory");
+        // Check whether we have looped through the entire list
+        // was unable to find a suitable allocation
+        if (metadata == nextAllocation) {
+            initSystemInfo(); // Reset memory
+            crash(String("No Memory (REQ: ")
+                + String::ParseInt(size)
+                + String(", RAM: ") 
+                + String::ParseInt((uint)systemInfo.memoryRAM, StringConversionFormat::HEX)
+                + String(", N=")
+                + String::ParseInt(allocations - 1)
+                + String(")"));
         }
     }
 
-    // Mark allocation as allocated
-    int oldSize = metadata->size;
+    // A suitable allocation was found so reserve it.
     metadata->allocated = true;
+    
+    // In order to keep memory functional and as we are at the
+    // end of the list, we need to ensure that we always
+    // have more allocations available by 'fragmenting' this allocation.
+    if (metadata->next == NULL) {
+        if ((ulong)metadata + size + MALLOC_METADATASIZE < (ulong)systemInfo.memoryEnd) {
+            // Resize current allocation to appropriate size.
+            int oldSize = metadata->size;
+            metadata->size = size;
 
-    // Initialise next metadata if necessary.
-    if (!metadata->nextAllocationAccessed) {
-        // 'Fragment' the allocation as new allocation data can be
-        // added directly after (with new size as leftover size from this allocation)
-        MemoryAllocationMetadata* nextMetadata = (MemoryAllocationMetadata*) 
-        ((char*) metadata + MALLOC_METADATASIZE + size);
-        metadata->nextAllocationAccessed = true;
-        metadata->size = size;
-        nextMetadata->nextAllocationAccessed = false;
-        nextMetadata->size = oldSize - size;
-        nextMetadata->allocated = false;
+            // Reset next metadata and set size of allocation.
+            metadata->next = (uint) 
+                ((ulong)metadata + MALLOC_METADATASIZE + size);
+
+            MemoryAllocationMetadata *nextMetadata = 
+                (MemoryAllocationMetadata *) (ulong) metadata->next;
+        
+            nextMetadata->previous = (uint) (ulong)metadata;
+            nextMetadata->allocated = false;
+            nextMetadata->next = NULL;
+            nextMetadata->size = oldSize - size - MALLOC_METADATASIZE;
+        }
+    }
+
+    // Keep reference to the next allocation which may be free.
+    if (metadata->next != NULL) {
+        nextAllocation = (MemoryAllocationMetadata*) (ulong) metadata->next;
     }
 
     return (void*) ((char*) metadata + MALLOC_METADATASIZE);
@@ -229,7 +264,7 @@ void crash(String errorMessage) {
         white);
     
     y += 20;
-    unsigned int coreId = getCoreId();
+    uint coreId = getCoreId();
     String coreDiagnostic = String("Executing Core ID: ") + String::ParseInt(coreId);
     crashGfx.DrawString(&systemFont, Point(16, y), coreDiagnostic, white);
 
@@ -243,7 +278,7 @@ void crash(String errorMessage) {
     for(int i = 0; i < SYSTEM_STACKTRACE_MAXSTEPS && i < 12; i++) {
         y += 20;
 
-        unsigned int address = trace.stack[i];
+        uint address = trace.stack[i];
 
         if (address == NULL) {
             break;
@@ -253,7 +288,7 @@ void crash(String errorMessage) {
         String printedString = at + String::ParseInt(address, StringConversionFormat::HEX);
         String printedString2 = printedString + (String(" <") + label.name + String("+"));
         
-        unsigned int offset = address - label.address;
+        uint offset = address - label.address;
         String printedString3 = printedString2
             + String::ParseInt(offset, StringConversionFormat::HEX)
                 .Substring(4) // It is expected that a function does not exceed 0xFFFF. 
@@ -267,21 +302,36 @@ void crash(String errorMessage) {
     while (1);
 }
 
-unsigned int magic(unsigned int value) {
+uint magic(uint value) {
     return ((value & 0xFF) << 24)
         | ((value & 0xFF00) << 8)
         | ((value & 0xFF0000) >> 8)
         | ((value & 0xFF000000) >> 24);
 }
 
-extern "C" void memcpy(void* dest, const void* src, unsigned long count) {
+extern "C" void memcpy(void* dest, const void* src, ulong count) {
     char* copyTo = (char*)dest;
     char* copyFrom = (char*)src;
 
+    if (count >= DMA_MINIMUM_TRANSFER && ((ulong) src % 4 == 0)
+        && ((ulong) dest % 4 == 0) && USE_DMA_FOR_MEMCPY) {
+        // Must use DMA to prevent CPU wastage from memcpy
+        // however the locations must be aligned to 32-bit
+        ulong words = count / 4;
+        ulong bytes = count - words * 4; 
+        DMAManager::Transfer((uint *)src, (uint *)dest, (int)(words * 4));
+        
+        // Adjust manual copy amount to bytes and copy address
+        int adjustment = count - bytes;
+        copyTo += adjustment;
+        copyFrom += adjustment;
+        count = bytes;
+    } 
+
     while(count > 0) {
-        *copyTo = *copyFrom;
-        copyTo++;
-        copyFrom++;
-        count--;
+            *copyTo = *copyFrom;
+            copyTo++;
+            copyFrom++;
+            count--;
     }
 }

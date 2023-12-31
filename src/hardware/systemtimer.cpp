@@ -1,17 +1,15 @@
 #include <hardware/systemtimer.hpp>
 #include <system.hpp>
-
+#include <commons.hpp>
 SystemTimer* SystemTimer::GetSystemTimer() {
     return (SystemTimer*) (PERIPHERAL_BASE + SYSTEMTIMER_BASE);
 }
 
-unsigned int SystemTimer::GetSystemTimerFrequency() {
-    register unsigned long freq;
-    asm volatile("mrs %0, cntfrq_el0" : "=r"(freq));
-    return freq;
+uint SystemTimer::GetSystemTimerFrequency() {
+    return SYSTEMTIMER_FREQ;
 }
 
-unsigned long SystemTimer::GetSystemTime() {
+ulong SystemTimer::GetSystemTime() {
     SystemTimer* timer = SystemTimer::GetSystemTimer();
 
     // An error (resulting in an incorrect) 
@@ -20,8 +18,8 @@ unsigned long SystemTimer::GetSystemTime() {
     //   after the low value is already set, then the low value is incorrect.
     // - If the low value doesn't overflow when read, and the high value changes
     //   after the low value overflows, then both values is incorrect.
-    unsigned long lowValue = timer->lowRegister;
-    unsigned long highValue = timer->highRegister;
+    ulong lowValue = timer->lowRegister;
+    ulong highValue = timer->highRegister;
 
     // To avoid the issue, just ensure if the high value did change then both values
     // get updated.

@@ -1,7 +1,7 @@
 #ifndef _H_FONT
 #define _H_FONT
 #include <gfx/psf2.hpp>
-
+#include <commons.hpp>
 /// @brief A font to draw text with (ASCII support only)
 struct PSF2Font {
     public:
