@@ -12,12 +12,6 @@ Also credits to PeterLemon for his assembly tutorials which also helped enormous
 The OsDEV wiki also contains helpful resources that I have looked at and used (such as the stacktracing)
 https://wiki.osdev.org/
 
-## Why C++ and not C
-Previously I have programmed a bare metal RPI image using C, however
-have decided to go with C++ due to a few reasons (mainly preference):
-* C++ has a number of features such as encapsulation (writing methods inside structs/classes) that make it desirable. This OOP way makes it easier to write 'cleaner' code.
-* C++ supports everything C can, so there shouldn't be any issues with compatibility.
-
 ## Compiler
 This compilation uses AArch64 bare-metal target compiler (aarch64-none-elf), from ARM.
 Since the development platform that I am using is Windows, I have
