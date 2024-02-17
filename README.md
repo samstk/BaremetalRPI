@@ -12,6 +12,10 @@ Also credits to PeterLemon for his assembly tutorials which also helped enormous
 The OsDEV wiki also contains helpful resources that I have looked at and used (such as the stacktracing)
 https://wiki.osdev.org/
 
+## Aims
+To make a simple OS for my handheld device which runs on a 3a+. In order to do this, I've used C++. At the moment though, many language features of C++
+will not work.
+
 ## Compiler
 This compilation uses AArch64 bare-metal target compiler (aarch64-none-elf), from ARM.
 Since the development platform that I am using is Windows, I have
