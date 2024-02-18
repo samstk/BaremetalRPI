@@ -61,6 +61,18 @@ struct TimeSpan {
         /// @return A new timespan resulting from the operation
         TimeSpan AddNanoseconds(ulong amount);
 
+        /// @brief Calculates the second component of this timespan.
+        /// @return The second component of this timespan.
+        int GetSecondComponent();
+
+        /// @brief Calculates the minute component of this timespan.
+        /// @return The minute component of this timespan.
+        int GetMinuteComponent();
+
+        /// @brief Calculates the hour component of this timespan
+        /// @return The hour component of this timespan.
+        int GetHourComponent();
+
         /// @brief Gets the current time since the boot of the machine
         /// @return The current time since the boot of the machine
         static TimeSpan GetCurrentTime();

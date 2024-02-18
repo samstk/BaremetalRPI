@@ -33,12 +33,30 @@ TimeSpan TimeSpan::AddMilliseconds(ulong amount) {
     return TimeSpan(this->ticks + TimeSpan(amount, ::MILLISECOND).ticks);
 }
 
+int TimeSpan::GetSecondComponent() {
+    long ticksInMinute = TimeSpan(60, ::SECOND).ticks;
+    long ticksInSecond = TimeSpan(1, ::SECOND).ticks;
+    return (this->ticks % ticksInMinute) / ticksInSecond;
+}
+
 TimeSpan TimeSpan::AddSeconds(ulong amount) {
     return TimeSpan(this->ticks + TimeSpan(amount, ::SECOND).ticks);
 }
 
+int TimeSpan::GetMinuteComponent() {
+    long ticksInHour = TimeSpan(60*60, ::SECOND).ticks;
+    long ticksInMinute = TimeSpan(60, ::SECOND).ticks;
+    return (this->ticks % ticksInHour) / ticksInMinute;
+}
+
 TimeSpan TimeSpan::AddMinutes(ulong amount) {
     return this->AddSeconds(amount * 60);
+}
+
+int TimeSpan::GetHourComponent() {
+    long ticksInDay = TimeSpan(60*60*24, ::SECOND).ticks;
+    long ticksInHour = TimeSpan(60*60, ::SECOND).ticks;
+    return (this->ticks % ticksInDay) / ticksInHour;
 }
 
 TimeSpan TimeSpan::AddHours(ulong amount) {

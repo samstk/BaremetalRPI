@@ -143,15 +143,16 @@ void Graphics::FillRectangle(Rectangle region, Color color) {
 
     // Calculate offset to starting print line
     buffer += (region.y * this->bufferWidth) + region.x;
-
     for(int y = 0; y < h; y++) {
         for(int x = 0; x < w; x++) {
             *buffer = color.data;
             buffer++;
         }
 
+
         // Calculate offset to next print line 
-        buffer += (this->bufferWidth - w);
+        buffer += this->bufferWidth;
+        buffer -= w;
     }
 }
 

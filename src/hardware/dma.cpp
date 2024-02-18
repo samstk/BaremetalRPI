@@ -7,6 +7,7 @@
 #define DMA_CHANNELS_OFFSET 0x100
 #define DMA_CHANNEL_COUNT 15
 
+
 #pragma region struct DMAControlBlock
 DMAControlBlock::DMAControlBlock() { }
 
@@ -81,6 +82,15 @@ void DMAManager::Init() {
 void DMAManager::Transfer(int channelNumber, 
     uint *source, uint *dest, int length) {
 
+    #ifdef DISABLE_DMA
+    for(int i = 0; i < length; i++) {
+        *dest = *source;
+        source++;
+        dest++;
+    }
+    return;
+    #endif
+
     DMAControlBlock block = dmaControlBlocks[channelNumber] = DMAControlBlock();
     block.sourceAddress = (uint)(ulong)source;
     block.destAddress = (uint)(ulong)dest;
@@ -89,7 +99,6 @@ void DMAManager::Transfer(int channelNumber,
     DMAChannel* channel = 
         (DMAChannel*) (ulong) 
         (PERIPHERAL_BASE + DMA_CHANNELS_BASE + channelNumber * DMA_CHANNELS_OFFSET);
-    crash("Unexpected case");
     channel->Reset();
     channel->SetControlBlock(&block);
     channel->Start();

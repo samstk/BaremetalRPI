@@ -21,4 +21,7 @@ bash -c "cd ~/build-kernel8 && chmod +x ./play.sh && make"
 
 :: Copy output if any
 xcopy /Y /E /I  "\\wsl.localhost\Ubuntu\home\samst\build-kernel8\build" "build"
+
+:: Play
+"C:\Program Files\qemu\qemu-system-aarch64.exe"  -M raspi3ap -kernel build/kernel8.img -serial stdio -d trace:bcm2837_systmr*,int,in_asm -D qemu.log
 exit

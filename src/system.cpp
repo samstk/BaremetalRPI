@@ -240,6 +240,10 @@ extern "C" void free(void* alloc) {
     metadata->allocated = false;
 }
 
+extern "C" void __cxa_pure_virtual() {
+    crash("A pure virtual function was called");
+}
+
 void setSystemFramebuffer(Framebuffer buffer) {
     _systemFramebuffer = buffer;
 }

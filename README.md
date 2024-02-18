@@ -22,7 +22,16 @@ Since the development platform that I am using is Windows, I have
 installed WSL (Ubuntu) and am using batch scripts to transfer the
 necessary files between the current folder and the build folder.
 
+## Emulating on Windows
+I've followed the tutorial on
+https://gist.github.com/billti/d904fd6124bf6f10ba2c1e3736f0f0f7 to install
+qemu-system-aarch64 on windows since my qemu-system-aarch64 on ubuntu was having graphical
+errors. If using ubuntu, go into the build-kernel8 folder and do the ./play.sh command,
+else the emulation window will pop up after every build.
+
 ## Running the Image on Raspberry PI 3A+
+(AS OF THIS BUILD THE IMAGE WON'T WORK CORRECTLY ON ACTUAL HARDWARE, IT WILL WORK ON QEMU.
+LOOK AT LAST COMMIT FOR A WORKING PREVIEW on RPI3A+)
 You will need a SD card with the bare minimum firmware on it. Copy
 the kernel8.img file into the root folder of the SD card.
 
