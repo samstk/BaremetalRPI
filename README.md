@@ -1,6 +1,9 @@
 # BaremetalRPI
 A C++ implementation of a bare metal OS for the Raspberry PI 3a+.
 
+## Current State
+Currently no longer continuing with this project. This will be archived however the source is still available in case anyone wants a look.
+
 ## Credits
 Credits to bztsrc on Github for his C tutorials
 (https://github.com/bztsrc/raspi3-tutorial/blob/master/), which helped enormously for the
